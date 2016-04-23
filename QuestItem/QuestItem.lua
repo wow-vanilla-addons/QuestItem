@@ -29,6 +29,9 @@ History:
 	New in version 1.4
 	- Added support for Menus on quest items using AxuMenuItems mod.
 	- Request to sky channel for identification of items if not found in the questlog.
+
+New in version 1.3.4:
+- Bug "attempt to call global 'getLootLinkServer' (a nil value)" should now have been resolved.
 	
 	New in version 1.3.3:
 	- Alert on unidentified items is now working

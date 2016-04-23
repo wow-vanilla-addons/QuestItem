@@ -114,12 +114,16 @@ end
 --[[ LootLink support - grabbed from Norganna's EnhTooltip ]]--
 function QuestItem_getLootLinkLink(name)
 	local itemLink = ItemLinks[name];
-	if (itemLink and itemLink.c and itemLink.i and LootLink_CheckItemServer(itemLink, getLootLinkServer())) then
+	if (itemLink and itemLink.c and itemLink.i and LootLink_CheckItemServer(itemLink, QuestItem_getLootLinkServer())) then
 		local item = string.gsub(itemLink.i, "(%d+):(%d+):(%d+):(%d+)", "%1:0:%3:%4");
 		local link = "|c"..itemLink.c.."|Hitem:"..item.."|h["..name.."]|h|r";
 		return link;
 	end
 	return nil;
+end
+
+function QuestItem_getLootLinkServer()
+	return LootLinkState.ServerNamesToIndices[GetCVar("realmName")];
 end
 
 --[[ LootLink support - grabbed from Norganna's EnhTooltip ]]--
