@@ -26,29 +26,49 @@ Feature summary:
 
 	
 History:
-	New in version 1.2
+	New in version 1.4
 	- Added support for Menus on quest items using AxuMenuItems mod.
 	- Request to sky channel for identification of items if not found in the questlog.
+	
+	New in version 1.3:
+	- EnhTooltip dependency removed!
+	- Manually mapped items should now display correct status if the mapped quest is in the questlog.
+	New in version 1.2:
+	- German translation (thanks to Philipp Kresin)
+	- Minor fix when trying to identify quests. Should make german version work better.
+	
+	New in version 1.1.1:
+	- Fixed a problem which caused item count to be incorrect in tooltip.
+	
 	New in version 1.1:
 	- When an item is identified from tooltip, the count of required items are returned.
 	- FR client is now supported
 	- French translation
+	
+	New in version 1.0.1:
+	- Updated toc file
+	
 	New in version 1.0:
 	- Removed message to the chat window on load. Just annoying with too many addons adding loaded message there.
 	- Configuration.
 	- Manual mapping of items.
 	- Alert when QuestItem is unable to map item to quest.
-	- Support for localization - only need translations.
+	
 	New in version 0.3:
-	- Using Enchanted Tooltip instead of LootLink to display item tooltip.
+	- Using Enhanced Tooltip instead of LootLink to display item tooltip.
+	Known issues in version 0.3:
+	
 	New in version 0.2:
 	- Quest items that are not labeled "Quest Item" are now displayed with status in the tooltip.
 	- Item count is now displayed next to the quest name in tooltip.
+	
+	New in version 0.1:
+	- First release
 ]]--
 
 -- /script arg1="Dentrium-Kraftstein: 1/1"; QuestItem_OnEvent("DELETE"); arg1="Roon's Kodo Horn: 1/1"; QuestItem_OnEvent("UI_INFO_MESSAGE");
 -- /script arg1="Dentrium Power Stone: 5/8"; QuestItem_OnEvent("UI_INFO_MESSAGE"); QuestItem_OnEvent("DELETE");
--- /script arg1="An'Alleum Power Stone"; QuestItem_OnEvent("DELETE"); QuestItem_OnEvent("DELETE");
+-- /script arg1="An' Alleum-Kraftstein"; QuestItem_OnEvent("DELETE"); QuestItem_OnEvent("DELETE");
 
 DEBUG = false;
 QI_CHANNEL_NAME = "QuestItem";
@@ -117,6 +137,13 @@ function QuestItem_FindQuest(item)
 		if(not isHeader) then
 			SelectQuestLogEntry(y);
 			local QDescription, QObjectives = GetQuestLogQuestText();
+			
+			-- Find out if this item has already been mapped to a quest. 
+			-- This is to to prevent any reset of the status for manually mapped items.
+			if(QuestItems[item] and (QuestItems[item].QuestName and QuestItems[item].QuestName == QuestName) ) then
+				QuestItem_UpdateItem(item, QuestName, count, total, 0)
+				return QuestName, total, count, texture;
+			end
 
 			-- Look for the item in quest leader boards
 			if (GetNumQuestLeaderBoards() > 0) then 
@@ -150,7 +177,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function QuestItem_LocateQuest(itemText, itemCount, itemTotal)
-	local QuestName, total, count, texture;
+	local QuestName, texture;
+	
 	-- Only look through the questlog if the item has not already been mapped to a quest
 	if(not QuestItems[itemText] or QuestItems[itemText].QuestName == QUESTITEM_UNIDENTIFIED) then
 		QuestName, itemTotal, itemCount, texture = QuestItem_FindQuest(itemText);
@@ -174,25 +202,20 @@ end
 function QuestItem_OnLoad()
 	RegisterForSave("QuestItems");
 	RegisterForSave("QuestItem_Settings");
+	
 	this:RegisterEvent("VARIABLES_LOADED");
-	
-	if(QuestItem_Settings["version"] and QuestItem_Settings["Enabled"] == true) then
-		this:RegisterEvent("UI_INFO_MESSAGE");
-	end
-	
-	
+
 	-- Register slash commands
 	SLASH_QUESTITEM1 = "/questitem";
 	SLASH_QUESTITEM2 = "/qi";
-	SLASH_QUESTITEM3 = "/qs";
 	SlashCmdList["QUESTITEM"] = QuestItem_Config_OnCommand;
 	
 	QuestItem_PrintToScreen(QUESTITEM_LOADED);
 	
-	QuestItem_OldTooltip = TT_AddTooltip;
-	TT_AddTooltip = QuestItem_AddTooltip;
 	--QuestItem_Sky_OnLoad();
+	QuestItem_HookTooltip();
 end
+
 
 -----------------
 -- OnEvent method
@@ -202,6 +225,10 @@ function QuestItem_OnEvent(event)
 	if(event == "VARIABLES_LOADED") then
 		QuestItem_VariablesLoaded();
 		this:UnregisterEvent("VARIABLES_LOADED");
+		
+		if(QuestItem_Settings["version"] and QuestItem_Settings["Enabled"] == true) then
+			this:RegisterEvent("UI_INFO_MESSAGE");		
+		end
 		return;
 	end
 	
@@ -214,8 +241,8 @@ function QuestItem_OnEvent(event)
 		local itemCount = gsub(arg1,"(.*): (%d+)/(%d+)","%2");
 		local itemTotal = gsub(arg1,"(.*): (%d+)/(%d+)","%3");
 		-- Ignore trade and duel events
-		QuestItem_Debug("Looking for quest item "..itemText);
 		if(not strfind(itemText, QUESTITEM_TRADE) and not strfind(itemText, QUESTITEM_DUEL) and not strfind(itemText, QUESTITEM_DISCOVERED)) then
+			QuestItem_Debug("Looking for quest item "..itemText);
 			QuestItem_LocateQuest(itemText, itemCount, itemTotal);
 		end
 	elseif(event == "DELETE") then

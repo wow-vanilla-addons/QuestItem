@@ -23,11 +23,13 @@ end
 -- the text in the tooltip.
 ---------------------------------------------------
 ---------------------------------------------------
-function QuestItem_IsQuestItem(frame)
-	local tooltip = getglobal("GameTooltipTextLeft"..2);
-	if(tooltip and tooltip:GetText()) then
-		if(QuestItem_SearchString(tooltip:GetText(), QUESTITEM_QUESTITEM)) then
-			return true;
+function QuestItem_IsQuestItem(tooltip)
+	if(tooltip) then
+		local tooltip = getglobal(tooltip:GetName() .. "TextLeft"..2);
+		if(tooltip and tooltip:GetText()) then
+			if(QuestItem_SearchString(tooltip:GetText(), QUESTITEM_QUESTITEM)) then
+				return true;
+			end
 		end
 	end
 	return false;
@@ -38,7 +40,7 @@ end
 ---------------------------------------
 ---------------------------------------
 function QuestItem_SearchString(text, item)
-	if(string.find(text, item) ) then
+	if(string.find(string.lower(text), string.lower(item)) ) then
 		return true;
 	end
 	return false;
