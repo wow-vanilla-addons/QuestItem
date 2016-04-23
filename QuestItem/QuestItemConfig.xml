@@ -685,7 +685,7 @@
 				</Frames>
 				<Layers>
 					<Layer level="ARTWORK">
-						<FontString name="FooterVersion" inherits="GameFontNormal" text="v1.x.x">
+						<FontString name="FooterVersion" inherits="GameFontNormal">
 							<Anchors>
 								<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM">
 									<Offset>

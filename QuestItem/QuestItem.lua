@@ -26,10 +26,14 @@ Feature summary:
 
 	
 History:
+	New in version 1.5.2:
+	- Fixed RegisterForSave in 1.10
+
 	New in version 1.5.1:
 	- Fixed a weird graphics issue with the item list.
 	- Resized the close button to fit the rectangle its placed inside
 	- Added version information in the item list
+	- Right click for pop-up on linked items in chat should be working
 
 	New in version 1.5.0:
 	- Sorting of items in the list.
@@ -179,8 +183,8 @@ end
 ---------------
 ---------------
 function QuestItem_OnLoad()
-	RegisterForSave("QuestItems");
-	RegisterForSave("QuestItem_Settings");
+	-- RegisterForSave("QuestItems");
+	-- RegisterForSave("QuestItem_Settings");
 	
 	this:RegisterEvent("VARIABLES_LOADED");
 
