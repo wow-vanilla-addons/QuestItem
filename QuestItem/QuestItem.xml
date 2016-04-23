@@ -3,10 +3,9 @@
 	<Script file="localization.de.lua"/>
 	<Script file="localization.fr.lua"/>
 	<Script file="QuestItem.lua"/>
-	<Script file="QuestItemFunctions.lua" />
 	<Script file="QuestItemTooltip.lua" />
-	<!--Script file="QuestItemSky.lua" /-->
 	<Include file="QuestItemConfig.xml" />
+	<!--Script file="QuestItemSky.lua" /-->
 	<Frame name="QuestItem" parent="UIParent" hidden="true">
 		<Scripts>
 			<OnLoad>

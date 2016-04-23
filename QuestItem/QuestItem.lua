@@ -26,58 +26,11 @@ Feature summary:
 
 	
 History:
-	New in version 1.4
-	- Added support for Menus on quest items using AxuMenuItems mod.
-	- Request to sky channel for identification of items if not found in the questlog.
+	New in version 1.3.5:
+	- Should work in the bank, even with Emerald UI
+	
+	See older history in Changelog.txt
 
-New in version 1.3.4:
-- Bug "attempt to call global 'getLootLinkServer' (a nil value)" should now have been resolved.
-	
-	New in version 1.3.3:
-	- Alert on unidentified items is now working
-	
-	New in version 1.3.2:
-	- Removed an annoying bug with messages saying QuestItem was unable to identify quest for fishing, flight path, trade skills, sending mail, etc
-	- Fixed a bug in a function for converting values to int (thanks to piderman)
-	
-	New in version 1.3.1:
-	- Bugfix for the error 'Interface\AddOns\QuestItem\QuestItemFunctions.lua:78 :bad argument #1 to 'strsub' (string expected, got nil)'
-	
-	New in version 1.3:
-	- EnhTooltip dependency removed!
-	- Manually mapped items should now display correct status if the mapped quest is in the questlog.
-	
-	New in version 1.2:
-	- German translation (thanks to Thernel)
-	- Minor fix when trying to identify quests. Should make german version work better.
-	
-	New in version 1.1.1:
-	- Fixed a problem which caused item count to be incorrect in tooltip.
-	
-	New in version 1.1:
-	- When an item is identified from tooltip, the count of required items are returned.
-	- FR client is now supported
-	- French translation
-	
-	New in version 1.0.1:
-	- Updated toc file
-	
-	New in version 1.0:
-	- Removed message to the chat window on load. Just annoying with too many addons adding loaded message there.
-	- Configuration.
-	- Manual mapping of items.
-	- Alert when QuestItem is unable to map item to quest.
-	
-	New in version 0.3:
-	- Using Enhanced Tooltip instead of LootLink to display item tooltip.
-	Known issues in version 0.3:
-	
-	New in version 0.2:
-	- Quest items that are not labeled "Quest Item" are now displayed with status in the tooltip.
-	- Item count is now displayed next to the quest name in tooltip.
-	
-	New in version 0.1:
-	- First release
 ]]--
 
 -- /script arg1="Dentrium-Kraftstein: 1/1"; QuestItem_OnEvent("DELETE"); arg1="Roon's Kodo Horn: 1/1"; QuestItem_OnEvent("UI_INFO_MESSAGE");
@@ -293,4 +246,131 @@ function QuestItem_VariablesLoaded()
 	end
 	QuestItem_Settings["ShiftOpen"] = false;
 	QuestItem_Settings["AltOpen"] = false;
+end
+
+
+---------------
+---------------
+---------------
+-- FUNCTIONS --
+---------------
+---------------
+---------------
+
+
+-- Print debug message to the default chatframe.
+-- Only works if the DEBUG variable in the 
+-- beginning of QuestItem.lua is set to true.
+------------------------------------------------
+------------------------------------------------
+function QuestItem_Debug(message)
+	if(DEBUG) then
+		if(not message) then
+			DEFAULT_CHAT_FRAME:AddMessage("Debug: Message was nil", 0.9, 0.5, 0.3);
+		else
+			DEFAULT_CHAT_FRAME:AddMessage("Debug: " ..message, 0.9, 0.5, 0.3);
+		end
+	end
+end
+
+function QuestItem_PrintToScreen(message)
+	UIErrorsFrame:AddMessage(message, 0.4, 0.5, 0.8, 1.0, 8);
+end
+
+---------------------------------------------------
+-- Find out if an item is a quest item by searching 
+-- the text in the tooltip.
+---------------------------------------------------
+---------------------------------------------------
+function QuestItem_IsQuestItem(tooltip)
+	if(tooltip) then
+		local tooltip = getglobal(tooltip:GetName() .. "TextLeft"..2);
+		if(tooltip and tooltip:GetText()) then
+			if(QuestItem_SearchString(tooltip:GetText(), QUESTITEM_QUESTITEM)) then
+				return true;
+			end
+		end
+	end
+	return false;
+end
+
+---------------------------------------
+-- Look for the item in the text string
+---------------------------------------
+---------------------------------------
+function QuestItem_SearchString(text, item)
+	if(string.find(string.lower(text), string.lower(item)) ) then
+		return true;
+	end
+	return false;
+end
+
+-- Copied functions - don't want to depend on too many AddOns
+
+-- From LootLink
+function QuestItem_MakeIntFromHexString(str)
+	if(not str) then
+		return 0;
+	end
+	local remain = str;
+	local amount = 0;
+	while( remain ~= "" ) do
+		amount = amount * 10;
+		local byteVal = string.byte(strupper(strsub(remain, 1, 1)));
+		if( byteVal >= string.byte("0") and byteVal <= string.byte("9") ) then
+			amount = amount + (byteVal - string.byte("0"));
+		end
+		remain = strsub(remain, 2);
+	end
+	return amount;
+end
+
+function QuestItem_CheckNumeric(string)
+	local remain = string;
+	local hasNumber;
+	local hasPeriod;
+	local char;
+	
+	while( remain ~= "" and remain ~= nil) do
+	--while( remain ~= "") do
+		char = strsub(remain, 1, 1);
+		if( char >= "0" and char <= "9" ) then
+			hasNumber = 1;
+		elseif( char == "." and not hasPeriod ) then
+			hasPeriod = 1;
+		else
+			return nil;
+		end
+		remain = strsub(remain, 2);
+	end
+	
+	return hasNumber;
+end
+
+-- From Sea
+function QuestItem_ScanTooltip()
+	local tooltipBase = "GameTooltip";
+	local strings = {};
+	for idx = 1, 10 do
+		local textLeft = nil;
+		local textRight = nil;
+		ttext = getglobal(tooltipBase.."TextLeft"..idx);
+		if(ttext and ttext:IsVisible() and ttext:GetText() ~= nil)
+		then
+			textLeft = ttext:GetText();
+		end
+		ttext = getglobal(tooltipBase.."TextRight"..idx);
+		if(ttext and ttext:IsVisible() and ttext:GetText() ~= nil)
+		then
+			textRight = ttext:GetText();
+		end
+		if (textLeft or textRight)
+		then
+			strings[idx] = {};
+			strings[idx].left = textLeft;
+			strings[idx].right = textRight;
+		end	
+	end
+	
+	return strings;
 end

@@ -1,4 +1,0 @@
-hei
-dei
-weee
-gee

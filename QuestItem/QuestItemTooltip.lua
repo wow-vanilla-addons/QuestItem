@@ -73,6 +73,7 @@ local base_AIOI_ModifyItemTooltip;
 local base_LootLinkItemButton_OnEnter;
 local base_IMInv_ItemButton_OnEnter
 local base_ItemsMatrixItemButton_OnEnter;
+--local base_EngInventory_ModifyItemTooltip;
 
 ----------------------------------
 -- [[ Hook tooltip functions ]] --
@@ -102,13 +103,23 @@ function QuestItem_HookTooltip()
 		LootLinkItemButton_OnEnter = QuestItem_LootLinkItemButton_OnEnter;
 		QuestItem_Debug("Hooking to LootLink");
 	end
-	
+
 	--[[ AllInOneInventory support - grabbed from Norganna's EnhTooltip ]]--
 	if (AllInOneInventory_ModifyItemTooltip ~= nil) then
 		base_AIOI_ModifyItemTooltip = AllInOneInventory_ModifyItemTooltip;
 		AllInOneInventory_ModifyItemTooltip = QuestItem_AIOI_ModifyItemTooltip;
 		QuestItem_Debug("Hooking to AIOI");
 	end
+	
+	--[[
+	if(EngInventory_ModifyItemTooltip ~= nil) then
+		base_EngInventory_ModifyItemTooltip = EngInventory_ModifyItemTooltip;
+		EngInventory_ModifyItemTooltip = QuestItem_AIOI_ModifyItemTooltip;
+		QuestItem_Debug("Hooking to EngInventory");
+	else
+		QuestItem_Debug("No inventory stuff to hook");
+	end
+	]]--
 end
 
 --[[ LootLink support - grabbed from Norganna's EnhTooltip ]]--
@@ -141,8 +152,12 @@ end
 --------------------------------------------------
 -- [[ Hook up with AllInOneInventory tooltip ]] --
 --------------------------------------------------
-function QuestItem_AIOI_ModifyItemTooltip(bag, slot, tooltipName)
-	base_AIOI_ModifyItemTooltip(bag, slot, tooltipName);
+function QuestItem_AIOI_ModifyItemTooltip(bag, slot, tooltipName, empty)
+	if(base_AIOI_ModifyItemTooltip ~= nil) then
+		base_AIOI_ModifyItemTooltip(bag, slot, tooltipName);
+	elseif(base_EngInventory_ModifyItemTooltip ~= nil) then
+		base_EngInventory_ModifyItemTooltip(bag, slot, tooltipName, nil);
+	end
 
 	local tooltip = getglobal(tooltipName);
 	if (not tooltip) then
@@ -166,9 +181,8 @@ end
 --------------------------------------
 -- [[ Set tooltip for bank items ]] --
 --------------------------------------
-function QuestItem_GameTooltip_SetInventoryItem(this, unit, slot)
-	local hasItem, hasCooldown, repairCost = base_GameTooltip_SetInventoryItem(this, unit, slot);
-
+function QuestItem_GameTooltip_SetInventoryItem(userData, unit, slot)
+	local hasItem, hasCooldown, repairCost = base_GameTooltip_SetInventoryItem(userData, unit, slot);
 	local link = GetInventoryItemLink(unit, slot);
 	if (link) then
 		local name = QuestItem_nameFromLink(link);
