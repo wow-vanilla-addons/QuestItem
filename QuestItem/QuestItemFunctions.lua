@@ -56,12 +56,10 @@ function QuestItem_MakeIntFromHexString(str)
 	local remain = str;
 	local amount = 0;
 	while( remain ~= "" ) do
-		amount = amount * 16;
+		amount = amount * 10;
 		local byteVal = string.byte(strupper(strsub(remain, 1, 1)));
 		if( byteVal >= string.byte("0") and byteVal <= string.byte("9") ) then
 			amount = amount + (byteVal - string.byte("0"));
-		elseif( byteVal >= string.byte("A") and byteVal <= string.byte("F") ) then
-			amount = amount + 10 + (byteVal - string.byte("A"));
 		end
 		remain = strsub(remain, 2);
 	end
@@ -74,7 +72,8 @@ function QuestItem_CheckNumeric(string)
 	local hasPeriod;
 	local char;
 	
-	while( remain ~= "" ) do
+	while( remain ~= "" and remain ~= nil) do
+	--while( remain ~= "") do
 		char = strsub(remain, 1, 1);
 		if( char >= "0" and char <= "9" ) then
 			hasNumber = 1;

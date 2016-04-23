@@ -1,5 +1,5 @@
 -- QuestItem DE localization
--- Translated by: Philipp Kresin
+-- Translated by: Thernel
 if (GetLocale()=="deDE") then
 	QUESTITEM_UNIDENTIFIED 			= "Unidentifizierte quest";
 	QUESTITEM_LOADED 				= QUESTITEM_TITLE .. " " .. QUESTITEM_VERSION .. " Geladen";

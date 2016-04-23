@@ -429,7 +429,7 @@
 						</Anchors>
 					</CheckButton>
 					<!-- Mapping failed checkbox -->
-					<CheckButton name="QuestItem_Config_Checkbox2" inherits="QuestItemCheckboxTemplate" id="2">
+					<CheckButton name="QuestItem_Config_Checkbox2" inherits="QuestItemCheckboxTemplate" id="2" hidden="true">
 						<Anchors>
 							<Anchor point="LEFT" relativePoint="BOTTOMLEFT" relativeTo="QuestItem_Config_Checkbox1">
 								<Offset>
