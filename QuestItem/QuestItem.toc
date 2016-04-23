@@ -1,7 +1,7 @@
 ## Title: QuestItem
-## Interface: 1600
+## Interface: 1700
 ## Author: Shagoth on Stormreaver server
-## Version: 1.0.0
+## Version: 1.0.1
 ## Notes: QuestItem stores an in-game database over quest items and tell you which quest they belong to. Useful to find out if you are still on the quest, and if it safe to destroy it.
 ## RequiredDeps: EnhTooltip
 ## SavedVariables: QuestItems, QuestItem_Settings
