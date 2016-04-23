@@ -2,7 +2,7 @@
 Default localization for QuestItem
 ]]--
 
-QUESTITEM_VERSION 				= "v1.5.2";
+QUESTITEM_VERSION 				= "v1.5.3";
 QUESTITEM_NAME 					= "QuestItem";
 QUESTITEM_TITLE 				= "Shagoth's " .. QUESTITEM_NAME;
 

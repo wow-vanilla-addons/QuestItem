@@ -1,35 +1,40 @@
+-- Version : French 
+-- Last Update : 04/27/2006 ( by Sasmira - Cosmos Team )
+
 if (GetLocale()=="frFR") then
 	-- Translate below here
-	QUESTITEM_UNIDENTIFIED 			= "Non identifiÈ qu\195\170te";
-	QUESTITEM_LOADED 				= QUESTITEM_TITLE .. " " .. QUESTITEM_VERSION .. " ChargÈ";
-	QUESTITEM_SLAIN					= "tu\195\169";
-	QUESTITEM_QUESTITEM				= "Objet de qu\195\170te";
+	QUESTITEM_UNIDENTIFIED = "Qu\195\170te non identifi\195\169e";
+	QUESTITEM_LOADED = QUESTITEM_TITLE .. " " .. QUESTITEM_VERSION .. " Charg\195\169";
+	QUESTITEM_SLAIN = "tu\195\169";
+	QUESTITEM_QUESTITEM = "Objet de qu\195\170te";
 	
-	QUESTITEM_CANTIDENTIFY			= "Probl√©me díidentification de qu\195\170te ";
-	QUESTITEM_QUESTCOMPLETE   		= "La qu\195\170te est compl√©te";
-	QUESTITEM_COMPLETEABANDONED  	= "La qu\195\170te est complËte ou abandonn√©e";
-	QUESTITEM_QUESTACTIVE   		= "La qu\195\170te est active";
+	QUESTITEM_CANTIDENTIFY = "Impossible d\'identifier la qu\195\170te";
+	QUESTITEM_QUESTCOMPLETE = "Qu\195\170te compl\195\168te";
+	QUESTITEM_COMPLETEABANDONED = "Qu\195\170te compl\195\168te ou abandonn\195\169e";
+	QUESTITEM_QUESTACTIVE = "Qu\195\170te active";
 	
 	-- Configuration window
-	QUESTITEM_ITEMS					= "Objets";
-	QUESTITEM_SETTINGS				= "Configurations";
-	QUESTITEM_CFG_CHK_ENABLED		= "Permis";
-	QUESTITEM_CFG_CHK_ENABLED_TT	= "Laisser coch√© pour permettre QuestItem.";
-	QUESTITEM_CFG_CHK_ALERT			= "Avertir en cas d'√©chec de qu\195\170te d'objet";
-	QUESTITEM_CFG_CHK_ALERT_TT		= "Cocher pour permettre une alerte visuelle quand vous choisissez une qu\195\170te d'objet et quand QuestItem ne r√©ussit pas √¥ attribuer un objet ‡ une qu\195\170te. Cette alerte apparait pour que vous puissiez attribuer manuellement un objet ‡ une \195\170.";
-	QUESTITEM_CFG_CHK_DISREQU		= "Afficher le menu de requ\195\17te dans le tooltip.";
-	QUESTITEM_CFG_CHK_DISREQU_TT	= "Aficher 'Requ\195\170te d'attribution' menuitem dans le tooltip pour les objets non -identifi√©s.";
-	QUESTITEM_CFG_CHK_SHIFTOPN 		= "Majuscule + clique pour ouvrir QuestLog pour objet";
-	QUESTITEM_CFG_CHK_SHIFTOPN_TT	= "Permettre Majuscule + clique-√¥-gauche pour ovrir le questlog pour la qu\195\170te √¥ laquelle un objet appartient.";
-	QUESTITEM_CFG_CHK_ALTOPN 		= "Alternative + clique pourouvir QuestLog pour objet.";
+	QUESTITEM_ITEMS = "Objets";
+	QUESTITEM_SETTINGS = "Configurations";
+	QUESTITEM_CFG_CHK_ENABLED = "Activer QuestItem";
+	QUESTITEM_CFG_CHK_ENABLED_TT = "Active le suivi des Objets de qu\195\170te.";
+	QUESTITEM_CFG_CHK_ALERT = "Alerter lorsque la recherche d\'objet de qu\195\170te \195\169choue";
+	QUESTITEM_CFG_CHK_ALERT_TT = "Affiche une alerte visuelle lorsque vous choisissez une qu\195\170te et que QuestItem ne r\195\169ussit pas \n\195\160 attribuer un objet \195\160 une qu\195\170te.\nCette alerte apparait afin que vous puissiez attribuer manuellement l\'objet \195\160 la qu\195\170te.";
+	QUESTITEM_CFG_CHK_DISREQU = "Afficher le menu d\'\'Identification d\'Objets\' dans la Bulle d\'Aide.";
+	QUESTITEM_CFG_CHK_DISREQU_TT = "Affiche le menu d\'\'identification d\'Objets\' dans la Bulle d\'Aide tooltip pour les objets non identifi\195\169s.";
+	QUESTITEM_CFG_CHK_SHIFTOPN = "SHIFT+Clic pour ouvrir Le Journal de Qu\195\170te.";
+	QUESTITEM_CFG_CHK_SHIFTOPN_TT = "Active le SHIFT+Clic Gauche afin d\'ouvrir le Journal de Qu\195\170te sur la qu\195\170te correspondant \195\160 l\'objet.";
+	QUESTITEM_CFG_CHK_ALTOPN = "ALT+Clic pour ouvrir le Journal de Qu\195\170te.";
+	QUESTITEM_CFG_CHK_ALTOPN_TT = "Active le ALT+Clic Gauche afin d\'ouvrir le Journal de Qu\195\170te sur la qu\195\170te correspondant \195\160 l\'objet.";
 	
-	QUESTITEM_INP_TITLE				= "QuestItem Attribution";
-	QUESTITEM_ITM_SHOWALL			= "Afficher les non-attibutions seulement";
-	QUESTITEM_ITM_SHOWALL_TT		= "D√©cocher pour afficher les objets non-identifi√©s seulement.";
+	QUESTITEM_INP_TITLE = "Identification d\'Objets";
+	QUESTITEM_ITM_SHOWALL = "Affiche uniquement les Objets affect\195\169s \195\160 une qu\195\170te";
+	QUESTITEM_ITM_SHOWALL_TT = "D\195\169cocher pour afficher uniquement les objets non identifi\195\169s.";
 	
-	QUESTITEM_SAVE					= "Sauvegarder";
-	QUESTITEM_CANCEL				= "Annuler";
+	QUESTITEM_SAVE = "Sauvegarder";
+	QUESTITEM_CANCEL = "Annuler";
 end
+
 
 -- Í = \195\170
 -- ‡ = √¥
