@@ -2,7 +2,7 @@
 Default localization for QuestItem
 ]]--
 
-QUESTITEM_VERSION 				= "1.0.1";
+QUESTITEM_VERSION 				= "1.1";
 QUESTITEM_NAME 					= "QuestItem";
 QUESTITEM_TITLE 				= "Shagoth's " .. QUESTITEM_NAME;
 
@@ -13,8 +13,12 @@ QUESTITEM_LOADED 				= QUESTITEM_TITLE .. " " .. QUESTITEM_VERSION .. " Loaded";
 QUESTITEM_TRADE 				= "Trade";
 QUESTITEM_DUEL 					= "Duel";
 QUESTITEM_DISCOVERED			= "Discovered";
+QUESTITEM_QUESTITEM				= "Quest Item";
 
 QUESTITEM_CANTIDENTIFY			= "Unable to identify quest for ";
+QUESTITEM_QUESTCOMPLETE			= "Quest is complete";
+QUESTITEM_COMPLETEABANDONED		= "Quest is complete or abandoned";
+QUESTITEM_QUESTACTIVE			= "Quest is active";
 
 -- Configuration window
 QUESTITEM_ITEMS					= "Items";

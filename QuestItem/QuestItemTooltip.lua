@@ -23,11 +23,11 @@ function QuestItem_AddTooltip(frame, name, link, quantity, count)
 			if(QuestItem_IsQuestItem(tooltip) ) then
 				local name = tooltipInfo[1].left;
 
-				local QuestName = QuestItem_FindQuest(name);
+				local QuestName, total, count, texture = QuestItem_FindQuest(name);
 				if(not QuestName) then
 					QuestItem_UpdateItem(name, QUESTITEM_UNIDENTIFIED, quantity, 0, 3)
 				else
-					QuestItem_UpdateItem(name, QuestName, quantity, 0, 0)
+					QuestItem_UpdateItem(name, QuestName, quantity, total, 0)
 				end
 			end
 		end
@@ -53,10 +53,10 @@ function QuestItem_AddTooltip(frame, name, link, quantity, count)
 				if(not QuestItem_SearchString(QuestItems[name].QuestName, QUESTITEM_UNIDENTIFIED) ) then
 					-- Display quest status
 					if(QuestItems[name][UnitName("player")].QuestStatus == 0) then
-						TT_AddLine("Quest is active", nil, embed);
+						TT_AddLine(QUESTITEM_QUESTACTIVE, nil, embed);
 						TT_LineColor(0, 1, 0);
 					elseif(QuestItems[name][UnitName("player")].QuestStatus == 1 or QuestItems[name][UnitName("player")].QuestStatus == 2) then
-						TT_AddLine("Quest is complete or abandoned", nil, embed);
+						TT_AddLine(QUESTITEM_COMPLETEABANDONED, nil, embed);
 						TT_LineColor(0.7, 0.7, 07);
 					end
 				end

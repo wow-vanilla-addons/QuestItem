@@ -26,8 +26,7 @@ end
 function QuestItem_IsQuestItem(frame)
 	local tooltip = getglobal("GameTooltipTextLeft"..2);
 	if(tooltip and tooltip:GetText()) then
-		local str = string.gsub(tooltip:GetText(), "(Quest Item)", "%1")
-		if(str == "Quest Item") then
+		if(QuestItem_SearchString(tooltip:GetText(), QUESTITEM_QUESTITEM)) then
 			return true;
 		end
 	end

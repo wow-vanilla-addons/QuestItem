@@ -7,10 +7,47 @@ are still o	n the quest, and if it safe to destroy it. The AddOn will map items 
 has a limited backward compatability. If you see tooltip for a questitem you have picked up before installing the addon, 
 QuestItem will try to find the item in your questlog, and map it to a quest. In case unsuccessful, the item will be marked 
 as unidentified.
+
+QuestItem now has a configuration screen you can access by typing /questitem or /qi at the chat prompt. Here you can configure
+some of the functionallity as well as do manual mapping of unidentified items.
+
+Feature summary:
+- Identify quest items when picked up.
+- Show quest name and status in tooltip for quest items.
+- Will try to identify items picked up before the AddOn was installed.
+- Identified items are available for all your characters, and status is unique for your character.
+- Displays how many items are needed to complete quest, and how many you currently have.
+- Manual mapping for unidentified items.
+- Configuration
+
++ If you like this addon (or even if you don't), donations are always welcome to my character Shagoth on the Stormreaver server ;D
++ If you can translate the interface to german, edit the appropriate localization.lua file, and mail it to me at shagoth@gmail.com
++ Bug reports can be made adding a comment, or sending me a PM or email at shagoth@gmail.com
+
+	
+History:
+	New in version 1.2
+	- Added support for Menus on quest items using AxuMenuItems mod.
+	- Request to sky channel for identification of items if not found in the questlog.
+	New in version 1.1:
+	- When an item is identified from tooltip, the count of required items are returned.
+	- FR client is now supported
+	- French translation
+	New in version 1.0:
+	- Removed message to the chat window on load. Just annoying with too many addons adding loaded message there.
+	- Configuration.
+	- Manual mapping of items.
+	- Alert when QuestItem is unable to map item to quest.
+	- Support for localization - only need translations.
+	New in version 0.3:
+	- Using Enchanted Tooltip instead of LootLink to display item tooltip.
+	New in version 0.2:
+	- Quest items that are not labeled "Quest Item" are now displayed with status in the tooltip.
+	- Item count is now displayed next to the quest name in tooltip.
 ]]--
 
-
 DEBUG = false;
+QI_CHANNEL_NAME = "QuestItem";
 
 -- QuestItem array
 QuestItems = {};
@@ -57,14 +94,17 @@ end
 ----------------------------------------------------------------------
 -- Find a quest based on item name
 -- Returns:
--- 			QuestName  - the name of the Quest.
---			Total	   - Total number of items required to complete it
---			Count	   - The number of items you have
+-- 			QuestName  	- the name of the Quest.
+--			Total	   	- Total number of items required to complete it
+--			Count	   	- The number of items you have
+--			Texture		- Texture of the item
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 function QuestItem_FindQuest(item)
-	local Total = 0;
-	local Count = 0;
+	local total = 1;
+	local count = 0;
+	local texture = nil;
+	local itemName;
 	
 	-- Iterate the quest log entries
 	for y=1, GetNumQuestLogEntries(), 1 do
@@ -73,11 +113,7 @@ function QuestItem_FindQuest(item)
 		if(not isHeader) then
 			SelectQuestLogEntry(y);
 			local QDescription, QObjectives = GetQuestLogQuestText();
-			
-			-- Look for the item in the objectives - no count and total will be returned
-			if(QuestItem_SearchString(QObjectives, item)) then
-				return QuestName, Total, Count;
-			end
+
 			-- Look for the item in quest leader boards
 			if (GetNumQuestLeaderBoards() > 0) then 
 				-- Look for the item in leader boards
@@ -85,17 +121,23 @@ function QuestItem_FindQuest(item)
 					--local str = getglobal("QuestLogObjective"..i);
 					local text, itemType, finished = GetQuestLogLeaderBoard(i);
 					-- Check if type is an item, and if the item is what we are looking for
-					--QuestItem_Debug(itemType);
+					--QuestItem_Debug("Item type: " ..itemType);
 					if(itemType ~= nil and (itemType == "item" or itemType == "object") ) then
 						if(QuestItem_SearchString(text, item)) then
-							return QuestName, Total, Count;
+							local count = gsub(text,"(.*): (%d+)/(%d+)","%2");
+							local total = gsub(text,"(.*): (%d+)/(%d+)","%3");
+							return QuestName, total, count, texture;
 						end
 					end
 				end
 			end
+			-- Look for the item in the objectives - no count and total will be returned
+			if(QuestItem_SearchString(QObjectives, item)) then
+				return QuestName, total, count, texture;
+			end
 		end
 	end
-	return nil, total, count;
+	return nil, total, count, texture;
 end
 
 --------------------------------------------------------------------------------
@@ -103,10 +145,10 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function QuestItem_LocateQuest(itemText, itemCount, itemTotal)
-	local QuestName;
+	local QuestName, total, count, texture;
 	-- Only look through the questlog if the item has not already been mapped to a quest
 	if(not QuestItems[itemText] or QuestItems[itemText].QuestName == QUESTITEM_UNIDENTIFIED) then
-		QuestName = QuestItem_FindQuest(itemText);
+		QuestName, total, count, texture = QuestItem_FindQuest(itemText);
 	else
 		QuestName = QuestItems[itemText].QuestName;
 	end
@@ -125,13 +167,9 @@ end
 ---------------
 ---------------
 function QuestItem_OnLoad()
-	QuestItem_OldTooltip = TT_AddTooltip;
-	TT_AddTooltip = QuestItem_AddTooltip;
-	
 	RegisterForSave("QuestItems");
 	RegisterForSave("QuestItem_Settings");
 	this:RegisterEvent("VARIABLES_LOADED");
-	this:RegisterEvent("ITEM_PUSH");
 	
 	if(QuestItem_Settings["version"] and QuestItem_Settings["Enabled"] == true) then
 		this:RegisterEvent("UI_INFO_MESSAGE");
@@ -141,12 +179,14 @@ function QuestItem_OnLoad()
 	-- Register slash commands
 	SLASH_QUESTITEM1 = "/questitem";
 	SLASH_QUESTITEM2 = "/qi";
+	SLASH_QUESTITEM3 = "/qs";
 	SlashCmdList["QUESTITEM"] = QuestItem_Config_OnCommand;
 	
-	if ( DEFAULT_CHAT_FRAME ) then 
-		--DEFAULT_CHAT_FRAME:AddMessage(QUESTITEM_LOADED, 0.4, 0.5, 0.8);
-		QuestItem_PrintToScreen(QUESTITEM_LOADED);
-	end
+	QuestItem_PrintToScreen(QUESTITEM_LOADED);
+	
+	QuestItem_OldTooltip = TT_AddTooltip;
+	TT_AddTooltip = QuestItem_AddTooltip;
+	--QuestItem_Sky_OnLoad();
 end
 
 -----------------
@@ -158,28 +198,18 @@ function QuestItem_OnEvent(event)
 		QuestItem_VariablesLoaded();
 		this:UnregisterEvent("VARIABLES_LOADED");
 		return;
-	elseif(event == "ITEM_PUSH") then
-		if(arg1) then
-			QuestItem_Debug(arg1);
-		end
-		if(arg2) then
-			QuestItem_Debug(arg2);
-		end
-		if(arg3) then
-			QuestItem_Debug(arg3);
-		end
 	end
 	
 	if(not arg1) then
 		return;
 	end
-	QuestItem_Debug(arg1);
+
 	local itemText = gsub(arg1,"(.*): %d+/%d+","%1",1);
 	if(event == "UI_INFO_MESSAGE") then
 		local itemCount = gsub(arg1,"(.*): (%d+)/(%d+)","%2");
 		local itemTotal = gsub(arg1,"(.*): (%d+)/(%d+)","%3");
-		
 		-- Ignore trade and duel events
+		QuestItem_Debug("Looking for quest item "..itemText);
 		if(not strfind(itemText, QUESTITEM_TRADE) and not strfind(itemText, QUESTITEM_DUEL) and not strfind(itemText, QUESTITEM_DISCOVERED)) then
 			QuestItem_LocateQuest(itemText, itemCount, itemTotal);
 		end

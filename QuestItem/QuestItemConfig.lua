@@ -22,7 +22,11 @@ QuestItem_Config_CheckButtons = {
 };
 
 function QuestItem_Config_OnCommand(command)
-	QuestItemConfigFrame:Show();
+	if(command == "test") then
+		QuestItem_Sky_SendTestData();
+	else
+		QuestItemConfigFrame:Show();
+	end
 end
 
 function QuestItem_Config_Close()
