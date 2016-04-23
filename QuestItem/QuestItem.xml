@@ -5,6 +5,7 @@
 	<Script file="QuestItem.lua"/>
 	<Script file="QuestItemFunctions.lua" />
 	<Script file="QuestItemTooltip.lua" />
+	<!--Script file="QuestItemSky.lua" /-->
 	<Include file="QuestItemConfig.xml" />
 	<Frame name="QuestItem" parent="UIParent" hidden="true">
 		<Scripts>

@@ -46,6 +46,10 @@ History:
 	- Item count is now displayed next to the quest name in tooltip.
 ]]--
 
+-- /script arg1="Dentrium-Kraftstein: 1/1"; QuestItem_OnEvent("DELETE"); arg1="Roon's Kodo Horn: 1/1"; QuestItem_OnEvent("UI_INFO_MESSAGE");
+-- /script arg1="Dentrium Power Stone: 5/8"; QuestItem_OnEvent("UI_INFO_MESSAGE"); QuestItem_OnEvent("DELETE");
+-- /script arg1="An'Alleum Power Stone"; QuestItem_OnEvent("DELETE"); QuestItem_OnEvent("DELETE");
+
 DEBUG = false;
 QI_CHANNEL_NAME = "QuestItem";
 
@@ -126,6 +130,7 @@ function QuestItem_FindQuest(item)
 						if(QuestItem_SearchString(text, item)) then
 							local count = gsub(text,"(.*): (%d+)/(%d+)","%2");
 							local total = gsub(text,"(.*): (%d+)/(%d+)","%3");
+							QuestItem_Debug("Count: " ..count);
 							return QuestName, total, count, texture;
 						end
 					end
@@ -148,7 +153,7 @@ function QuestItem_LocateQuest(itemText, itemCount, itemTotal)
 	local QuestName, total, count, texture;
 	-- Only look through the questlog if the item has not already been mapped to a quest
 	if(not QuestItems[itemText] or QuestItems[itemText].QuestName == QUESTITEM_UNIDENTIFIED) then
-		QuestName, total, count, texture = QuestItem_FindQuest(itemText);
+		QuestName, itemTotal, itemCount, texture = QuestItem_FindQuest(itemText);
 	else
 		QuestName = QuestItems[itemText].QuestName;
 	end

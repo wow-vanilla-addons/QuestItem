@@ -2,8 +2,8 @@
 -- Add tooltip information to the existing GameTooltip
 ----------------------------------------------------------
 ----------------------------------------------------------
-function QuestItem_AddTooltip(frame, name, link, quantity, count)
-	QuestItem_OldTooltip(frame, name, link, quality, count);
+function QuestItem_AddTooltip(frame, name, link, quantity, itemCount)
+	QuestItem_OldTooltip(frame, name, link, quality, itemCount);
 	if(QuestItem_Settings["Enabled"] == nil or QuestItem_Settings["Enabled"] == false) then
 		return;
 	end
@@ -27,7 +27,7 @@ function QuestItem_AddTooltip(frame, name, link, quantity, count)
 				if(not QuestName) then
 					QuestItem_UpdateItem(name, QUESTITEM_UNIDENTIFIED, quantity, 0, 3)
 				else
-					QuestItem_UpdateItem(name, QuestName, quantity, total, 0)
+					QuestItem_UpdateItem(name, QuestName, count, total, 0)
 				end
 			end
 		end
