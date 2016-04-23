@@ -1,9 +1,9 @@
-UIPanelWindows["QuestItemConfigFrame"] = { area = "Center", pushable = 5 };
-NUM_ITEMS_DISPLAY = 10;
-ITEM_HEIGHT = 31;
+UIPanelWindows["QuestItemConfigFrame"] = { area = "left", pushable = 3, whileDead = 1 };
+local NUM_ITEMS_DISPLAY = 8;
+ITEM_HEIGHT = 40;
 QuestItemsIdx = {};
-qiIndex = 1;
-ListAllItems = true;
+local qiIndex = 1;
+local ListAllItems = true;
 
 
 QuestItem_Config_Frames = 
@@ -13,12 +13,13 @@ QuestItem_Config_Frames =
 };
 
 QuestItem_Config_CheckButtons = { 
-	{ frame = "QuestItem_Config_Checkbox1", text = QUESTITEM_CFG_CHK_ENABLED,  	tooltipText = QUESTITEM_CFG_CHK_ENABLED_TT, setting="Enabled" },
-	{ frame = "QuestItem_Config_Checkbox2", text = QUESTITEM_CFG_CHK_ALERT,		tooltipText = QUESTITEM_CFG_CHK_ALERT_TT, setting="Alert"},
-	{ frame = "QuestItem_Config_Checkbox3", text = QUESTITEM_CFG_CHK_DISPLAYTT, tooltipText = QUESTITEM_CFG_CHK_DISPLAYTT_TT, setting="Display tooltip" },
-	{ frame = "QuestItem_Config_Checkbox4", text = QUESTITEM_CFG_CHK_ALTOPN, 	tooltipText = QUESTITEM_CFG_CHK_ALTOPN_TT, setting="AltOpen" },
-	{ frame = "QuestItem_Config_Checkbox5", text = QUESTITEM_CFG_CHK_SHIFTOPN, 	tooltipText = QUESTITEM_CFG_CHK_SHIFTOPN_TT, setting="ShiftOpen" },
-	{ frame = "QuestItem_Config_Checkbox6", text = QUESTITEM_CFG_CHK_DISREQU,  	tooltipText = QUESTITEM_CFG_CHK_DISREQU_TT, setting="DisplayRequest", tooltipRequirement="Requires: AxuMenuItem"},
+	{ frame = "QuestItem_Config_Checkbox1", text = QUESTITEM_CFG_CHK_ENABLED,  		tooltipText = QUESTITEM_CFG_CHK_ENABLED_TT, setting="Enabled" },
+	{ frame = "QuestItem_Config_Checkbox2", text = QUESTITEM_CFG_CHK_ALERT,			tooltipText = QUESTITEM_CFG_CHK_ALERT_TT, setting="Alert"},
+	{ frame = "QuestItem_Config_Checkbox3", text = QUESTITEM_CFG_CHK_DISPLAYTT, 	tooltipText = QUESTITEM_CFG_CHK_DISPLAYTT_TT, setting="Display tooltip" },
+	{ frame = "QuestItem_Config_Checkbox4", text = QUESTITEM_CFG_CHK_ALTOPN, 		tooltipText = QUESTITEM_CFG_CHK_ALTOPN_TT, setting="AltOpen" },
+	{ frame = "QuestItem_Config_Checkbox5", text = QUESTITEM_CFG_CHK_ONLYFORPLAYER,	tooltipText = QUESTITEM_CFG_CHK_ONLYFORPLAYER_TT, setting="DisplayForCharacterOnly"},
+	{ frame = "QuestItem_Config_Checkbox6", text = QUESTITEM_CFG_CHK_DISPLAYCOUNT,  tooltipText = QUESTITEM_CFG_CHK_DISPLAYCOUNT_TT, setting="DisplayItemCount"},
+
 	{ frame = "ItemFrameButton15", 			text = QUESTITEM_ITM_SHOWALL, 		tooltipText = QUESTITEM_ITM_SHOWALL, setting=nil },
 };
 
@@ -26,12 +27,12 @@ function QuestItem_Config_OnCommand(command)
 	if(command == "test") then
 		QuestItem_Sky_SendTestData();
 	else
-		QuestItemConfigFrame:Show();
+		ShowUIPanel(QuestItemConfigFrame);--:Show();
 	end
 end
 
 function QuestItem_Config_Close()
-	QuestItemConfigFrame:Hide();
+	HideUIPanel(QuestItemConfigFrame);
 end
 
 function QuestItem_Config_UpdateCheckboxes()
@@ -99,6 +100,9 @@ function QuestItem_Config_Tab_OnClick(id)
 	for index, value in QuestItem_Config_Frames do
 		if(value.tab == id) then
 			getglobal(value.frame):Show();
+			if(id == 2) then
+				QuestItem_Config_ItemFrame_OnShow();
+			end
 		else
 			getglobal(value.frame):Hide();
 		end
@@ -128,12 +132,21 @@ function QuestItem_Sort(lhs, rhs)
 	end
 end
 
------------------------------------------------------------
--- Filters out which items should be displayed in the list.
------------------------------------------------------------
------------------------------------------------------------
+--------------------------------------------------------------------
+-- [[ Filters out which items should be displayed in the list. ]] --
+--------------------------------------------------------------------
 function QuestItem_Config_CreateIndexed(value)
-	if(ListAllItems or QuestItems[value].QuestName == QUESTITEM_UNIDENTIFIED) then
+	local itemData = QuestItems[value];
+	if(ListAllItems or itemData.QuestName == QUESTITEM_UNIDENTIFIED) then
+		-- If setting says not display for other characters, return
+		if( (QuestItem_Settings["DisplayForCharacterOnly"] and QuestItem_Settings["DisplayForCharacterOnly"] == true) and not itemData[UnitName("player")]) then
+			return;
+		end
+		-- Update status when populating the list of quests to display
+		local fqQuestName, _, _, _, fqStatus = QuestItem_FindQuest(value, true);
+		if(fqQuestName and QuestItems[value][UnitName("player")]) then
+			QuestItems[value][UnitName("player")].QuestStatus = fqStatus;
+		end
 		QuestItemsIdx[qiIndex] = {};
 		QuestItemsIdx[qiIndex].Item = value;
 		qiIndex = qiIndex + 1;
@@ -152,33 +165,72 @@ function QuestItem_Config_ItemFrame_OnShow()
 end
 
 function QuestItem_Config_Items_Update()
-	local itemButton, itemName, itemQuest, itemIcon;
+	local itemButton, itemName, itemQuest, itemIcon, itemQuestStatus;
 	local offset;
 	if(QuestItemInputFrame:IsVisible()) then
 		return;
 	end
+	
 	FauxScrollFrame_Update(ItemFrameScrollFrame, qiIndex, NUM_ITEMS_DISPLAY, ITEM_HEIGHT);
 	for index=1, NUM_ITEMS_DISPLAY do
 		offset = index + FauxScrollFrame_GetOffset(ItemFrameScrollFrame);
 		itemButton = getglobal("ItemButton" .. index);
-		itemName 	= getglobal(itemButton:GetName() ..  "ButtonTextName");
-		itemQuest 	= getglobal(itemButton:GetName() ..  "ButtonTextQuest");
-		itemIcon 	= getglobal(itemButton:GetName() ..  "ItemIconNormalTexture");
+		itemName 		= getglobal(itemButton:GetName() ..  "ButtonTextName");
+		itemQuest 		= getglobal(itemButton:GetName() ..  "ButtonTextQuest");
+		itemQuestStatus = getglobal(itemButton:GetName() ..  "ButtonTextQuestStatus");
+		itemIcon 		= getglobal(itemButton:GetName() ..  "ItemIcon");
+		
+		-- Change width of items if there is no scrollbar
+		if(qiIndex < NUM_ITEMS_DISPLAY) then
+			itemButton:SetWidth(312);
+		else
+			itemButton:SetWidth(287);
+		end
 		-- Exit if there are less items in the list than we want to display, or we are displaying all items
 		if(offset <= qiIndex and index <= offset) then
+			local questItemData = QuestItems[QuestItemsIdx[offset].Item];
 			itemName:SetText(QuestItemsIdx[offset].Item);
-			if(QuestItems[QuestItemsIdx[offset].Item].QuestName == QUESTITEM_UNIDENTIFIED) then
+			-- Insert unidentified item
+			if(questItemData.QuestName == QUESTITEM_UNIDENTIFIED) then
 				itemQuest:SetTextColor(1, 0, 0);
 				if(QuestItem_Settings["Display tooltip"] == true) then
 					itemButton.tooltipText = QUESTITEM_ITEMS_EDIT_M_TT;
 				end
+			-- Insert identified item
 			else
 				itemQuest:SetTextColor(0.4, 0.5, 0.8);
 				if(QuestItem_Settings["Display tooltip"] == true) then
 					itemButton.tooltipText = QUESTITEM_ITEMS_EDIT_SHIFT_M_TT;
 				end
+
+				-- Display status if available for the player
+				if(questItemData[UnitName("player")]) then
+					local statusData = QuestStatusData[questItemData[UnitName("player")].QuestStatus];
+					itemQuestStatus:SetText(statusData.StatusText);
+					itemQuestStatus:SetTextColor(statusData.Red, statusData.Green, statusData.Blue);
+					if(QuestItem_Settings["DisplayItemCount"] and QuestItem_Settings["DisplayItemCount"] == true) then
+						itemQuest:SetText(questItemData.QuestName .. " (" .. questItemData[UnitName("player")].Count .. "/".. questItemData.Total .. ")");
+					else
+						itemQuest:SetText(questItemData.QuestName);
+					end
+				else
+					itemQuestStatus:SetText("");
+					if(QuestItem_Settings["DisplayItemCount"] and QuestItem_Settings["DisplayItemCount"] == true) then
+						itemQuest:SetText(questItemData.QuestName .. " (-/".. questItemData.Total .. ")");
+					else
+						itemQuest:SetText(questItemData.QuestName);
+					end
+				end
 			end
-			itemQuest:SetText(QuestItems[QuestItemsIdx[offset].Item].QuestName);
+			
+			
+			-- Set item texture
+			if(questItemData.Texture) then
+				itemIcon:SetNormalTexture(questItemData.Texture);
+			else
+				itemIcon:SetNormalTexture("Interface\\Icons\\INV_Misc_QuestionMark");
+			end
+
 			itemButton:Show();
 		else
 			itemButton:Hide();
@@ -187,15 +239,23 @@ function QuestItem_Config_Items_Update()
 end
 
 
-function QuestItem_InputFrame_Open(itemName)
+function QuestItem_InputFrame_Open(button, itemName)
 	local itemLabel = getglobal(itemName):GetText();
-	-- Display input frame for unidentified items, and if the shift key is down
-	if(not QuestItemInputFrame:IsVisible() and (QuestItems[itemLabel].QuestName == QUESTITEM_UNIDENTIFIED or IsShiftKeyDown()) ) then
-		QuestItemInputEditBox:SetText(QuestItems[itemLabel].QuestName);
-		QuestItemInputEditBox:HighlightText();
-		
-		QuestItemInputFrame:Show();
-		QuestItemInputFrameHeaderTitle:SetText(itemLabel);
+	-- Display input frame for unidentified items, and if the shift key is down	
+	if(button == "RigthButton" and not QuestItemInputFrame:IsVisible() and (QuestItems[itemLabel].QuestName == QUESTITEM_UNIDENTIFIED or IsShiftKeyDown())) then
+			QuestItemInputEditBox:SetText(QuestItems[itemLabel].QuestName);
+			QuestItemInputEditBox:HighlightText();
+
+			QuestItemInputFrame:Show();
+			QuestItemInputFrameHeaderTitle:SetText(itemLabel);
+	elseif(IsAltKeyDown() and QuestItems[itemLabel][UnitName("player")]) then
+		-- Toggle quest status
+		if(QuestItems[itemLabel][UnitName("player")].QuestStatus < QUESTSTATUS_COMPLETE) then
+			QuestItems[itemLabel][UnitName("player")].QuestStatus = QuestItems[itemLabel][UnitName("player")].QuestStatus + 1;
+		else
+			QuestItems[itemLabel][UnitName("player")].QuestStatus = 0;
+		end
+		QuestItem_Config_Items_Update();
 	end
 end
 

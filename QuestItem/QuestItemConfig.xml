@@ -1,10 +1,11 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
-	<Script file="QuestItemConfig.lua" />
+	<Include file="QuestItemTemplates.xml"/>
+	<Script file="QuestItemConfig.lua" />	
 
 	<!-- QUESTNAME INPUT FRAME -->
-	<Frame name="QuestItemInputFrame" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="QuestItemConfigFrame" enableKeyboard="true">
+	<Frame name="QuestItemInputFrame" toplevel="true" movable="true" enableMouse="true" hidden="true" parent="QuestItemConfigFrame" enableKeyboard="true">
 		<Size>
-			<AbsDimension x="300" y="125"/>
+			<AbsDimension x="300" y="125" />
 		</Size>
 		<Anchors>
 			<Anchor point="CENTER">
@@ -164,26 +165,6 @@
 			</Button>
 		</Frames>
 		<Scripts>
-		<!--
-			<OnMouseUp>
-				if ( this.isMoving ) then
-				this:StopMovingOrSizing();
-				this.isMoving = false;
-				end
-			</OnMouseUp>
-			<OnMouseDown>
-				if ( ( ( not this.isLocked ) or ( this.isLocked == 0 ) ) and ( arg1 == "LeftButton" ) ) then
-				this:StartMoving();
-				this.isMoving = true;
-				end
-			</OnMouseDown>
-			<OnHide>
-				if ( this.isMoving ) then
-				this:StopMovingOrSizing();
-				this.isMoving = false;
-				end
-			</OnHide>
-		-->
 			<OnLoad>
 				QuestItemInputFrameHeaderTitle:SetText(QUESTITEM_INP_TITLE);
 			</OnLoad>
@@ -194,198 +175,7 @@
 	</Frame>
 
 	<!-- TEMPLATES -->
-	<CheckButton name="QuestItemCheckboxTemplate" inherits="OptionsCheckButtonTemplate" virtual="true">
-		<Anchors>
-			<Anchor>
-				<Offset>
-					<AbsDimension x="0" y="0" />
-				</Offset>
-			</Anchor>
-		</Anchors>
-		<Size>
-			<AbsDimension x="32" y="32" />
-		</Size>
-	</CheckButton>
-	
-	<Button name="QuestItemTabTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true">
-		<Scripts>
-			<OnClick>
-				QuestItem_Config_Tab_OnClick(this:GetID());
-			</OnClick>
-		</Scripts>
-	</Button>
-	
-	<Button name="ItemFrameButtonTemplate" hidden="false" virtual="true">
-		<Size>
-			<AbsDimension x="340" y="31"/>
-		</Size>
-		<Frames>
-			<!--
-			<Button name="$parentItemIcon">
-				<Size>
-					<AbsDimension x="32" y="32"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOPLEFT">
-						<Offset>
-							<AbsDimension x="0" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<NormalTexture name="$parentNormalTexture" file="Interface\Buttons\UI-Quickslot2">
-					<Size>
-						<AbsDimension x="32" y="32"/>
-					</Size>
-					<Anchors>
-						<Anchor point="CENTER">
-							<Offset>
-								<AbsDimension x="0" y="0"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</NormalTexture>
-				<HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
-			</Button>
-			-->
-			<Frame name="$parentButtonText" setAllPoints="true">
-				<Layers>
-					<Layer level="BORDER">
-						<FontString name="$parentName" inherits="GameFontGreen">
-							<Anchors>
-								<Anchor point="TOPLEFT">
-									<Offset>
-										<AbsDimension x="10" y="-3"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-						</FontString>
-						<FontString name="$parentQuest" inherits="GameFontHighlightSmall" justifyH="LEFT">
-							<FontHeight>
-								<AbsValue val="14"/>
-							</FontHeight>
-							<Anchors>
-								<Anchor point="TOPLEFT" relativeTo="$parentName" relativePoint="BOTTOMLEFT">
-									<Offset>
-										<AbsDimension x="0" y="0"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-							<Color r="0.4" g="0.5" b="0.8" />
-						</FontString>
-					</Layer>
-				</Layers>
-			</Frame>
-		</Frames>
-		<Scripts>
-			<OnLoad>
-				this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-			</OnLoad>
-			<OnClick>
-				PlaySound("igMainMenuOptionCheckBoxOn");
-				QuestItem_InputFrame_Open(this:GetName() .. "ButtonTextName");
-			</OnClick>
-			<OnEnter>
-				if ( this.tooltipText ) then
-					GameTooltip:SetOwner(this, "ANCHOR_TOPLEFT");
-					GameTooltip:SetText(this.tooltipText, nil, nil, nil, nil, 1);
-				end
-				if ( this.tooltipRequirement ) then
-					GameTooltip:AddLine(this.tooltipRequirement, "", 1.0, 1.0, 1.0);
-					GameTooltip:Show();
-				end
-			</OnEnter>
-			<OnLeave>
-				GameTooltip:Hide();
-			</OnLeave>
-		</Scripts>
-		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
-	</Button>
-	
-	
-	<Frame name="QuestItemSubFrameTemplate" hidden="true" virtual="true">
-		<Size>
-			<AbsDimension x="384" y="400" /> 
-		</Size>
-	</Frame>
-	
-	<Frame name="QuestItemFrameTemplate" frameStrata="DIALOG" hidden="true" virtual="true">
-		<Size>
-			<AbsDimension x="384" y="444" /> 
-		</Size>
-		<Layers>
-			<Layer level="BACKGROUND">
-				<Texture file="Interface\HelpFrame\HelpFrame-TopLeft">
-					<Size>
-						<AbsDimension x="256" y="188"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPLEFT"/>
-					</Anchors>
-				</Texture>
-				<Texture file="Interface\HelpFrame\HelpFrame-TopRight">
-					<Size>
-						<AbsDimension x="128" y="188"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPRIGHT"/>
-					</Anchors>
-				</Texture>
-				<Texture file="Interface\HelpFrame\HelpFrame-BotLeft">
-					<Size>
-						<AbsDimension x="256" y="256"/>
-					</Size>
-					<Anchors>
-						<Anchor point="BOTTOMLEFT"/>
-					</Anchors>
-				</Texture>
-				<Texture file="Interface\HelpFrame\HelpFrame-BotRight">
-					<Size>
-						<AbsDimension x="128" y="256"/>
-					</Size>
-					<Anchors>
-						<Anchor point="BOTTOMRIGHT"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-			<Layer level="ARTWORK">
-				<Texture name="QuestItemConfigHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
-					<Size>
-						<AbsDimension x="330" y="64" />
-					</Size>
-					<Anchors>
-						<Anchor point="TOP">
-							<Offset>
-								<AbsDimension x="-10" y="12" />
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</Texture>
-				<FontString name="$parentHeaderTitle" inherits="GameFontNormal">
-					<Anchors>
-						<Anchor point="TOP" relativeTo="QuestItemConfigHeader">
-							<Offset>
-								<AbsDimension x="0" y="-14" />
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-			</Layer>
-		</Layers>
-		<Frames>
-			<Button name="QuestItemCloseButton" inherits="UIPanelCloseButton">
-				<Size>
-					<AbsDimension x="30" y="25" />
-				</Size>
-				<Anchors>
-					<Anchor point="TOPRIGHT">
-						<Offset>
-							<AbsDimension x="-42" y="-1"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-		</Frames>
-	</Frame>
+
 	
 	<Frame name="QuestItemConfigFrame" toplevel="true" enableMouse="true" movable="true" inherits="QuestItemFrameTemplate" parent="UIParent" hidden="true">
 		<Anchors>
@@ -411,7 +201,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
 						<Offset>
-							<AbsDimension x="15" y="11"/>
+							<AbsDimension x="15" y="15"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -424,6 +214,7 @@
 						</Offset>
 					</Anchor>
 				</Anchors>
+
 			</Button>
 			
 			<Frame name="ConfigFrame" setAllPoints="true" hidden="true" inherits="QuestItemSubFrameTemplate">
@@ -476,8 +267,8 @@
 						</Anchors>
 					</CheckButton>
 					
-					<!-- Shift click to open questlog -->
-					<CheckButton name="QuestItem_Config_Checkbox5" inherits="QuestItemCheckboxTemplate" id="5" hidden="true">
+					<!-- Only display items for current character -->
+					<CheckButton name="QuestItem_Config_Checkbox5" inherits="QuestItemCheckboxTemplate" id="5">
 						<Anchors>
 							<Anchor point="LEFT" relativePoint="BOTTOMLEFT" relativeTo="QuestItem_Config_Checkbox4">
 								<Offset>
@@ -488,7 +279,7 @@
 					</CheckButton>
 					
 					<!-- Display request menu -->
-					<CheckButton name="QuestItem_Config_Checkbox6" inherits="QuestItemCheckboxTemplate" id="6" hidden="true">
+					<CheckButton name="QuestItem_Config_Checkbox6" inherits="QuestItemCheckboxTemplate" id="6">
 						<Anchors>
 							<Anchor point="LEFT" relativePoint="BOTTOMLEFT" relativeTo="QuestItem_Config_Checkbox5">
 								<Offset>
@@ -502,7 +293,7 @@
 						<Anchors>
 							<Anchor point="BOTTOMLEFT" relativeTo="ConfigFrame">
 								<Offset>
-									<AbsDimension x="25" y="-22" />
+									<AbsDimension x="25" y="0" />
 								</Offset>
 							</Anchor>
 						</Anchors>
@@ -556,7 +347,7 @@
 						<Anchors>
 							<Anchor point="TOPLEFT">
 								<Offset>
-									<AbsDimension x="15" y="-46"/>
+									<AbsDimension x="20" y="-39"/>
 								</Offset>
 							</Anchor>
 						</Anchors>
@@ -624,6 +415,7 @@
 							</Anchor>
 						</Anchors>
 					</Button>
+					<!--
 					<Button name="ItemButton9" inherits="ItemFrameButtonTemplate" id="9">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="ItemButton8" relativePoint="BOTTOMLEFT">
@@ -642,9 +434,10 @@
 							</Anchor>
 						</Anchors>
 					</Button>
+					-->
 					<ScrollFrame name="ItemFrameScrollFrame" inherits="FauxScrollFrameTemplate">
 						<Size>
-							<AbsDimension x="320" y="358" /> 
+							<AbsDimension x="320" y="338" /> 
 						</Size>
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="ItemFrame">
@@ -655,14 +448,14 @@
 						</Anchors>
 						<Layers>
 							<Layer level="ARTWORK">
-								<Texture name="$parentTop" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+								<Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
 									<Size>
 										<AbsDimension x="31" y="256"/>
 									</Size>
 									<Anchors>
 										<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
 											<Offset>
-												<AbsDimension x="0" y="0"/>
+												<AbsDimension x="-2" y="5"/>
 											</Offset>
 										</Anchor>
 									</Anchors>
@@ -670,12 +463,12 @@
 								</Texture>
 								<Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
 									<Size>
-										<AbsDimension x="31" y="185"/>
+										<AbsDimension x="31" y="106"/>
 									</Size>
 									<Anchors>
 										<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
 											<Offset>
-												<AbsDimension x="0" y="-5"/>
+												<AbsDimension x="-2" y="-2"/>
 											</Offset>
 										</Anchor>
 									</Anchors>
@@ -696,7 +489,7 @@
 						<Anchors>
 							<Anchor point="BOTTOMLEFT" relativeTo="ItemFrame">
 								<Offset>
-									<AbsDimension x="15" y="-25" />
+									<AbsDimension x="15" y="-4" />
 								</Offset>
 							</Anchor>
 						</Anchors>
@@ -713,7 +506,7 @@
 							<Anchors>
 								<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM">
 									<Offset>
-										<AbsDimension x="130" y="-17" />
+										<AbsDimension x="130" y="5" />
 									</Offset>
 								</Anchor>
 							</Anchors>

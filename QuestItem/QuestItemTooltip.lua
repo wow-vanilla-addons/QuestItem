@@ -1,10 +1,8 @@
-----------------------------------------------------------
--- Add tooltip information to the existing GameTooltip
-----------------------------------------------------------
-----------------------------------------------------------
+---------------------------------------------------------------
+-- [[ Add tooltip information to the existing GameTooltip ]] --
+---------------------------------------------------------------
 function QuestItem_AddTooltip(frame, name, link, quantity, itemCount)
-	--QuestItem_OldTooltip(frame, name, link, quality, itemCount);
-	if(QuestItem_Settings["Enabled"] == nil or QuestItem_Settings["Enabled"] == false) then
+	if(not QuestItem_Enabled()) then
 		return;
 	end
 	
@@ -13,48 +11,61 @@ function QuestItem_AddTooltip(frame, name, link, quantity, itemCount)
     if ( not tooltip ) then
 		return;
     end
-	
+
     local tooltipInfo = QuestItem_ScanTooltip(frame);
+
     if ( tooltipInfo[1] ) then
-		-- Item not found in the database - look for it of it is a quest item
+		-- Item not found in the database - look for it if it is a quest item
 		if(not QuestItems[name] or QuestItem_SearchString(QuestItems[name].QuestName, QUESTITEM_UNIDENTIFIED) ) then
 			-- Check if the item is a Quest Item
 			if(QuestItem_IsQuestItem(tooltip) ) then
 				local name = tooltipInfo[1].left;
 
-				local QuestName, total, count, texture = QuestItem_FindQuest(name);
+				local QuestName, total, count, texture, status = QuestItem_FindQuest(name, true);
 				if(not QuestName) then
-					QuestItem_UpdateItem(name, QUESTITEM_UNIDENTIFIED, quantity, 0, 3)
+					QuestItem_UpdateItem(name, QUESTITEM_UNIDENTIFIED, quantity, 0, status);
 				else
-					QuestItem_UpdateItem(name, QuestName, count, total, 0)
+					QuestItem_UpdateItem(name, QuestName, count, total, status);
 				end
 			end
 		end
+		
 		-- Quest was found in the database
 		if(QuestItems[name]) then
+			-- If no texture is set for the item, set new texture
+			if(not QuestItems[name].Texture) then
+				QuestItems[name].Texture = QuestItem_GetTexture(link);
+			end
+			
+			if(not QuestItems[name][UnitName("player")]) then
+				local QuestName, total, count, texture, status = QuestItem_FindQuest(name, true);
+				if(QuestName) then
+					QuestItem_UpdateItem(name, QuestName, count, total, status);
+				end
+			end
 			-- There is data for the current player
 			if(QuestItems[name][UnitName("player")]) then
 				-- Total and Count is set, and is grater than 0 - don't want to display i.e 1/0
-				if( (QuestItems[name].Total and QuestItems[name].Total > 0) and (QuestItems[name][UnitName("player")].Count and QuestItems[name][UnitName("player")].Count > 0) ) then
-					tooltip:AddLine(QuestItems[name].QuestName .. " " .. QuestItems[name][UnitName("player")].Count .. "/" .. QuestItems[name].Total, 0.4, 0.5, 0.8);
+				if(QuestItem_Settings["DisplayItemCount"] and QuestItem_Settings["DisplayItemCount"] == true) then
+					if( (QuestItems[name].Total and QuestItems[name].Total > 0) and (QuestItems[name][UnitName("player")].Count and QuestItems[name][UnitName("player")].Count > 0) ) then
+						tooltip:AddLine(QuestItems[name].QuestName .. " " .. QuestItems[name][UnitName("player")].Count .. "/" .. QuestItems[name].Total, 0.4, 0.5, 0.8);
+					else
+						tooltip:AddLine(QuestItems[name].QuestName, 0.4, 0.5, 0.8);
+					end
 				else
 					tooltip:AddLine(QuestItems[name].QuestName, 0.4, 0.5, 0.8);
 				end
 				
-				-- Check status for quest - if it can't be found change status to abandoned/complete
-				if(QuestItems[name][UnitName("player")].QuestStatus ~= 0) then
-					if(not QuestItem_FindQuest(name)) then
-						QuestItems[name][UnitName("player")].QuestStatus = 1;
-					end
+				-- Update status
+				local fqQuestName, fqTotal, fqCount, fqTexture, fqStatus = QuestItem_FindQuest(name, true);
+				if(fqQuestName) then
+					QuestItems[name][UnitName("player")].QuestStatus = fqStatus;
 				end
 				-- Do not display status on the quest if it is unidentified
 				if(not QuestItem_SearchString(QuestItems[name].QuestName, QUESTITEM_UNIDENTIFIED) ) then
 					-- Display quest status
-					if(QuestItems[name][UnitName("player")].QuestStatus == 0) then
-						tooltip:AddLine(QUESTITEM_QUESTACTIVE, 0, 1, 0);
-					elseif(QuestItems[name][UnitName("player")].QuestStatus == 1 or QuestItems[name][UnitName("player")].QuestStatus == 2) then
-						tooltip:AddLine(QUESTITEM_COMPLETEABANDONED, 0.7, 0.7, 07);
-					end
+					local statusData = QuestStatusData[QuestItems[name][UnitName("player")].QuestStatus];
+					tooltip:AddLine(statusData.StatusText, statusData.Red, statusData.Green, statusData.Blue);
 				end
 			else
 				tooltip:AddLine(QuestItems[name].QuestName, 0.4, 0.5, 0.8);
@@ -62,6 +73,7 @@ function QuestItem_AddTooltip(frame, name, link, quantity, itemCount)
 			tooltip:Show();
 		end
 	end
+	
 end
 
 local base_ContainerFrameItemButton_OnEnter;
@@ -126,11 +138,7 @@ function QuestItem_HookTooltip()
 	-- Hook bank item 
 	base_BankFrameItemButtonGeneric_OnClick = BankFrameItemButtonGeneric_OnClick;
 	BankFrameItemButtonGeneric_OnClick = QuestItem_BankFrameItemButtonGeneric_OnClick;
-	
-	--base_BankFrameItemButtonBag_OnClick = BankFrameItemButtonBag_OnClick;
-	--BankFrameItemButtonBag_OnClick = QuestItem_BankFrameItemButtonBag_OnClick;
-	
-	
+
 	-- [[
 	if(EngInventory_ModifyItemTooltip ~= nil) then
 		base_EngInventory_ModifyItemTooltip = EngInventory_ModifyItemTooltip;
@@ -141,23 +149,11 @@ function QuestItem_HookTooltip()
 end
 
 --[[ LootLink support - grabbed from Norganna's EnhTooltip ]]--
-function QuestItem_getLootLinkLink(name)
-	local itemLink = ItemLinks[name];
-	if (itemLink and itemLink.c and itemLink.i and LootLink_CheckItemServer(itemLink, QuestItem_getLootLinkServer())) then
-		local item = string.gsub(itemLink.i, "(%d+):(%d+):(%d+):(%d+)", "%1:0:%3:%4");
-		local link = "|c"..itemLink.c.."|Hitem:"..item.."|h["..name.."]|h|r";
-		return link;
-	end
-	return nil;
-end
-
-function QuestItem_getLootLinkServer()
-	return LootLinkState.ServerNamesToIndices[GetCVar("realmName")];
-end
-
---[[ LootLink support - grabbed from Norganna's EnhTooltip ]]--
 function QuestItem_LootLinkItemButton_OnEnter()
 	base_LootLinkItemButton_OnEnter();
+	if(not QuestItem_Enabled()) then
+		return;
+	end
 
 	local name = this:GetText();
 	local link = QuestItem_getLootLinkLink(name);
@@ -184,6 +180,9 @@ function QuestItem_AIOI_ModifyItemTooltip(bag, slot, tooltipName, empty)
 	if (not tooltip) then 
 		return false; 
 	end
+	if(not QuestItem_Enabled()) then
+		return;
+	end
 
 	local link = GetContainerItemLink(bag, slot);
 	local name = QuestItem_nameFromLink(link);
@@ -200,6 +199,10 @@ end
 --------------------------------------
 function QuestItem_GameTooltip_SetInventoryItem(userData, unit, slot)
 	local hasItem, hasCooldown, repairCost = base_GameTooltip_SetInventoryItem(userData, unit, slot);
+
+	if(not QuestItem_Enabled()) then
+		return;
+	end
 	local link = GetInventoryItemLink(unit, slot);
 	if (link) then
 		local name = QuestItem_nameFromLink(link);
@@ -218,6 +221,10 @@ end
 --------------------------------------
 function QuestItem_GameTooltip_SetLootItem(this, slot)
 	base_GameTooltip_SetLootItem(this, slot);
+	
+	if(not QuestItem_Enabled()) then
+		return;
+	end
 	local link = GetLootSlotLink(slot);
 	local name = QuestItem_nameFromLink(link);
 	if (name) then
@@ -236,6 +243,10 @@ end
 ------------------------------------------------------
 function QuestItem_ContainerFrameItemButton_OnEnter()
 	base_ContainerFrameItemButton_OnEnter();
+	
+	if(not QuestItem_Enabled()) then
+		return;
+	end
 	local frameID = this:GetParent():GetID();
 	local buttonID = this:GetID();
 	local link = GetContainerItemLink(frameID, buttonID);
@@ -246,9 +257,25 @@ function QuestItem_ContainerFrameItemButton_OnEnter()
 		if (quality==nil or quality==-1) then 
 			quality = QuestItem_qualityFromLink(link); 
 		end
-
 		QuestItem_AddTooltip(GameTooltip, name, link, quantity, itemCount)
 	end
+end
+
+---------------------------------------
+-- [[ Get the texture for an item ]] --
+-- Returns:
+-- 			Texture of the item
+---------------------------------------
+function QuestItem_GetTexture(link)
+	local itemId = nil;
+	if ( type(link) == "string" ) then
+		_,_, itemId = string.find(link, "item:(%d+):");
+	end
+	if ( itemId ) then
+		local itemName, linkGIF, qualityGIF, minLevelGIF, classGIF, subclassGIF, maxStackGIF, invtypeGIV, iconGIF = GetItemInfo(itemId);
+		return iconGIF;
+	end
+	return nil;
 end
 
 ------------------------------------
@@ -257,11 +284,11 @@ end
 ------------------------------------
 function QuestItem_ContainerFrameItemButton_OnClick(button, ignoreModifiers)
 	local executeBase = true;
-	if(QuestItem_Settings["AltOpen"] == true) then
+	if(QuestItem_Enabled() and QuestItem_Settings["AltOpen"] == true) then
 		if(button == "RightButton" and not ignoreModifiers and IsAltKeyDown()) then
 			local bag, slot;
 			-- Look for bag and slot id
-			if(AllInOneInventoryFrameItemButton_OnClick ~= nil) then
+			if(AllInOneInventoryFrameItemButton_OnClick ~= nil and AllInOneInventory_GetIdAsBagSlot ~= nil) then
 				bag, slot = AllInOneInventory_GetIdAsBagSlot(this:GetID());
 			else
 				bag = this:GetParent():GetID();		
@@ -281,6 +308,9 @@ end
 function QuestItem_OpenLink(link)
 	local name = QuestItem_nameFromLink(link);
 	-- Open questlog for quest
+	if(not QuestItem_Enabled()) then
+		return;
+	end
 	if(name) then
 		if(QuestItems[name] and QuestItems[name].QuestName) then
 			QuestItem_OpenQuestLog(QuestItems[name].QuestName);
@@ -291,7 +321,7 @@ end
 
 function QuestItem_BankFrameItemButtonGeneric_OnClick(button)
 	local executeBase = true;
-	if(QuestItem_Settings["AltOpen"] == true) then
+	if(QuestItem_Enabled() and QuestItem_Settings["AltOpen"] == true) then
 		if(button == "RightButton" and not ignoreModifiers and IsAltKeyDown()) then
 			local link = GetContainerItemLink(BANK_CONTAINER, this:GetID());
 			QuestItem_OpenLink(link);
@@ -328,6 +358,24 @@ end
 
 function QuestItem_ContainerFrameItemButton_Update(frame)
 	base_ContainerFrame_Update(frame);
+end
+
+
+-----------------------------------------------------------------
+-- [[ LootLink support - grabbed from Norganna's EnhTooltip ]] --
+-----------------------------------------------------------------
+function QuestItem_getLootLinkLink(name)
+	local itemLink = ItemLinks[name];
+	if (itemLink and itemLink.c and itemLink.i and LootLink_CheckItemServer(itemLink, QuestItem_getLootLinkServer())) then
+		local item = string.gsub(itemLink.i, "(%d+):(%d+):(%d+):(%d+)", "%1:0:%3:%4");
+		local link = "|c"..itemLink.c.."|Hitem:"..item.."|h["..name.."]|h|r";
+		return link;
+	end
+	return nil;
+end
+
+function QuestItem_getLootLinkServer()
+	return LootLinkState.ServerNamesToIndices[GetCVar("realmName")];
 end
 
 ----------------------------------
