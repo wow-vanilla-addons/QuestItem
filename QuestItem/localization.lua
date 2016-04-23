@@ -2,10 +2,9 @@
 Default localization for QuestItem
 ]]--
 
-QUESTITEM_VERSION 				= "1.3.5";
+QUESTITEM_VERSION 				= "v1.5.1";
 QUESTITEM_NAME 					= "QuestItem";
 QUESTITEM_TITLE 				= "Shagoth's " .. QUESTITEM_NAME;
-
 
 -- Translate below here
 QUESTITEM_UNIDENTIFIED 			= "Unidentified quest";

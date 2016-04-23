@@ -87,6 +87,7 @@ function QuestItem_Config_OnLoad()
 	PanelTemplates_SetNumTabs(QuestItemConfigFrame, 2);
 	QuestItem_Config_Tab_OnClick(QuestItemConfigFrameTab1:GetID());
 	QuestItemConfigFrameHeaderTitle:SetText(QUESTITEM_TITLE);
+	FooterVersion:SetText(QUESTITEM_VERSION);
 	ItemFrameButton15:SetChecked(ListAllItems);
 	QuestItemConfigFrameTab1:SetText(QUESTITEM_SETTINGS);
 	QuestItemConfigFrameTab2:SetText(QUESTITEM_ITEMS);
@@ -113,8 +114,17 @@ function QuestItem_Config_CreateItemList(listAll)
 	qiIndex = 1;
 	ListAllItems = listAll;
 	
-	table.foreach(QuestItems, QuestItem_Config_CreateIndexed)
+	table.foreach(QuestItems, QuestItem_Config_CreateIndexed);
 	qiIndex = qiIndex - 1;
+	table.sort(QuestItemsIdx, QuestItem_Sort);
+end
+
+function QuestItem_Sort(lhs, rhs)
+	if(lhs.Item < rhs.Item) then
+		return true;
+	else
+		return false;
+	end
 end
 
 -----------------------------------------------------------

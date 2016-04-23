@@ -26,6 +26,18 @@ Feature summary:
 
 	
 History:
+	New in version 1.5.1:
+	- Fixed a weird graphics issue with the item list.
+	- Resized the close button to fit the rectangle its placed inside
+	- Added version information in the item list
+
+	New in version 1.5.0:
+	- Sorting of items in the list.
+	- Fixed the placement of the caption for the config window
+	
+	New in version 1.4.0:
+	- Support for EngInventory
+
 	New in version 1.3.5:
 	- Should work in the bank, even with Emerald UI
 	

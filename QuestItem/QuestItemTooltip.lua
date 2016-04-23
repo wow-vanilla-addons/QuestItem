@@ -111,7 +111,7 @@ function QuestItem_HookTooltip()
 		QuestItem_Debug("Hooking to AIOI");
 	end
 	
-	--[[
+	-- [[
 	if(EngInventory_ModifyItemTooltip ~= nil) then
 		base_EngInventory_ModifyItemTooltip = EngInventory_ModifyItemTooltip;
 		EngInventory_ModifyItemTooltip = QuestItem_AIOI_ModifyItemTooltip;
@@ -119,7 +119,7 @@ function QuestItem_HookTooltip()
 	else
 		QuestItem_Debug("No inventory stuff to hook");
 	end
-	]]--
+	-- ]] --
 end
 
 --[[ LootLink support - grabbed from Norganna's EnhTooltip ]]--
@@ -238,14 +238,16 @@ end
 ----------------------------------------
 -- [[ Set tooltip for linked items ]] --
 ----------------------------------------
-function QuestItem_Chat_OnHyperlinkShow(link, button)
-	base_Chat_OnHyperlinkShow(link, button);
-	if (ItemRefTooltip:IsVisible()) then
-		local name = ItemRefTooltipTextLeft1:GetText();
-		if (name) then
-			local fabricatedLink = "|cff000000|H"..link.."|h["..name.."]|h|r";
-			
-			QuestItem_AddTooltip(ItemRefTooltip, name, fabricatedLink, -1, 1, 0);
+function QuestItem_Chat_OnHyperlinkShow(reference, link, button)
+	base_Chat_OnHyperlinkShow(reference, link, button);
+	if(button == "LeftButton") then
+		if (ItemRefTooltip:IsVisible()) then
+			local name = ItemRefTooltipTextLeft1:GetText();
+			if (name) then
+				local fabricatedLink = "|cff000000|H"..link.."|h["..name.."]|h|r";
+				
+				QuestItem_AddTooltip(ItemRefTooltip, name, fabricatedLink, -1, 1, 0);
+			end
 		end
 	end
 end

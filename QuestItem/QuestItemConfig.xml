@@ -348,9 +348,9 @@
 				</Texture>
 				<FontString name="$parentHeaderTitle" inherits="GameFontNormal">
 					<Anchors>
-						<Anchor point="TOP" relativeTo="OptionsFrameHeader">
+						<Anchor point="TOP" relativeTo="QuestItemConfigHeader">
 							<Offset>
-								<AbsDimension x="-10" y="-97" />
+								<AbsDimension x="0" y="-14" />
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -359,10 +359,13 @@
 		</Layers>
 		<Frames>
 			<Button name="QuestItemCloseButton" inherits="UIPanelCloseButton">
+				<Size>
+					<AbsDimension x="30" y="25" />
+				</Size>
 				<Anchors>
 					<Anchor point="TOPRIGHT">
 						<Offset>
-							<AbsDimension x="-42" y="-3"/>
+							<AbsDimension x="-42" y="-1"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -633,7 +636,7 @@
 										<AbsDimension x="31" y="256"/>
 									</Size>
 									<Anchors>
-										<Anchor point="TOP" relativeTo="$parentScrollBarScrollUpButton">
+										<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
 											<Offset>
 												<AbsDimension x="0" y="0"/>
 											</Offset>
@@ -646,7 +649,7 @@
 										<AbsDimension x="31" y="185"/>
 									</Size>
 									<Anchors>
-										<Anchor point="BOTTOM" relativeTo="$parentScrollBarScrollDownButton">
+										<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
 											<Offset>
 												<AbsDimension x="0" y="-5"/>
 											</Offset>
@@ -680,6 +683,19 @@
 						</Scripts>
 					</CheckButton>
 				</Frames>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="FooterVersion" inherits="GameFontNormal" text="v1.x.x">
+							<Anchors>
+								<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM">
+									<Offset>
+										<AbsDimension x="130" y="-17" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
 			</Frame>
 		</Frames>
 	</Frame>
