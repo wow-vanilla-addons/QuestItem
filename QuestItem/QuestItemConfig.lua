@@ -190,8 +190,11 @@ function QuestItem_Config_Items_Update()
 		if(offset <= qiIndex and index <= offset) then
 			local questItemData = QuestItems[QuestItemsIdx[offset].Item];
 			itemName:SetText(QuestItemsIdx[offset].Item);
+			QuestItem_Debug(QuestItemsIdx[offset].Item .. " => " .. questItemData.QuestName);
 			-- Insert unidentified item
 			if(questItemData.QuestName == QUESTITEM_UNIDENTIFIED) then
+				itemQuest:SetText(questItemData.QuestName);
+				itemQuestStatus:SetText("");
 				itemQuest:SetTextColor(1, 0, 0);
 				if(QuestItem_Settings["Display tooltip"] == true) then
 					itemButton.tooltipText = QUESTITEM_ITEMS_EDIT_M_TT;
@@ -262,10 +265,11 @@ end
 
 function QuestItem_InputFrame_Save()
 	local itemName = QuestItemInputFrameHeaderTitle:GetText();
+	
 	if(QuestItemInputEditBox:GetText() == "") then
-		QuestItems[itemName].QuestName = QUESTITEM_UNIDENTIFIED;
+		QuestItem_UpdateItem(itemName, QUESTITEM_UNIDENTIFIED, 0, QuestItems[itemName].Total, QUESTSTATUS_ACTIVE);
 	else
-		QuestItems[itemName].QuestName = QuestItemInputEditBox:GetText();
+		QuestItem_UpdateItem(itemName, QuestItemInputEditBox:GetText(), 0, QuestItems[itemName].Total, QUESTSTATUS_ACTIVE);
 	end
 	QuestItemInputFrame:Hide();
 	QuestItem_Config_Items_Update();

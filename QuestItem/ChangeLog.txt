@@ -1,3 +1,8 @@
+New in version 1.7.2:
+- Fixed a nil error when completing/abandoning quest (special conditions).
+- Fixed an error in the item list where unidentified quests were displayed with invalid name and status.
+- Updated german language file (thanks to Morrowind).
+
 New in version 1.5.2:
 - Fixed RegisterForSave in 1.10
 

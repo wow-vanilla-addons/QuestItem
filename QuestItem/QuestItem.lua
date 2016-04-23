@@ -25,6 +25,11 @@ Known issues:
 
 	
 History:
+	New in version 1.7.2:
+	- Fixed a nil error when completing/abandoning quest (special conditions).
+	- Fixed an error in the item list where unidentified quests were displayed with invalid name and status.
+	- Updated german language file (thanks to Morrowind).
+	
 	New in version 1.7.1:
 	- Minor changes in language files
 	- Fixed a spelling error that prevented the edit box for items to display.
@@ -267,6 +272,7 @@ function QuestItem_OnLoad()
 	-- RegisterForSave("QuestItem_Settings");
 	
 	this:RegisterEvent("VARIABLES_LOADED");
+	this:RegisterEvent("QUEST_COMPLETE");
 
 	-- Register slash commands
 	SLASH_QUESTITEM1 = "/questitem";
@@ -314,11 +320,11 @@ end
 ----------------------------------------------------------------------------
 function QuestItem_SetQuestStatus(questTitle, questStatus)
 	if ( questTitle ) then
+		QuestItem_Debug("setting status for " .. questTitle);
 		questTitle = string.gsub(string.gsub(questTitle, '^[[].*[]]',''),'^ ','');
 		for itemName, itemData in QuestItems do 
 			if(itemData["QuestName"] and itemData.QuestName == questTitle) then
-				QuestItems[itemName][UnitName("player")].QuestStatus = questStatus;
-				QuestItem_Debug("changing status for item " .. itemName);
+				QuestItem_UpdateItem(itemName, questTitle, 0, QuestItems[itemName].Total, questStatus);
 				-- don't exit the loop as there might be more items for the quest
 			end
 		end
@@ -356,6 +362,8 @@ function QuestItem_OnEvent(event)
 			QuestItems[itemText] = nil;
 			QuestItem_Debug("Deleted");
 		end
+	elseif(event == "QUEST_COMPLETE") then
+		QuestItem_Debug("Completing quest " .. GetQuestLogTitle(GetQuestLogSelection()) );
 	end
 end
 
