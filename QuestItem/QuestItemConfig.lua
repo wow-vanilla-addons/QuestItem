@@ -15,9 +15,10 @@ QuestItem_Config_Frames =
 QuestItem_Config_CheckButtons = { 
 	{ frame = "QuestItem_Config_Checkbox1", text = QUESTITEM_CFG_CHK_ENABLED,  	tooltipText = QUESTITEM_CFG_CHK_ENABLED_TT, setting="Enabled" },
 	{ frame = "QuestItem_Config_Checkbox2", text = QUESTITEM_CFG_CHK_ALERT,		tooltipText = QUESTITEM_CFG_CHK_ALERT_TT, setting="Alert"},
-	{ frame = "QuestItem_Config_Checkbox3", text = QUESTITEM_CFG_CHK_DISREQU,  	tooltipText = QUESTITEM_CFG_CHK_DISREQU_TT, setting="DisplayRequest", tooltipRequirement="Requires: AxuMenuItem"},
-	{ frame = "QuestItem_Config_Checkbox4", text = QUESTITEM_CFG_CHK_SHIFTOPN, 	tooltipText = QUESTITEM_CFG_CHK_SHIFTOPN_TT, setting="ShiftOpen" },
-	{ frame = "QuestItem_Config_Checkbox5", text = QUESTITEM_CFG_CHK_ALTOPN, 	tooltipText = QUESTITEM_CFG_CHK_ALTOPN_TT, setting="AltOpen" },
+	{ frame = "QuestItem_Config_Checkbox3", text = QUESTITEM_CFG_CHK_DISPLAYTT, tooltipText = QUESTITEM_CFG_CHK_DISPLAYTT_TT, setting="Display tooltip" },
+	{ frame = "QuestItem_Config_Checkbox4", text = QUESTITEM_CFG_CHK_ALTOPN, 	tooltipText = QUESTITEM_CFG_CHK_ALTOPN_TT, setting="AltOpen" },
+	{ frame = "QuestItem_Config_Checkbox5", text = QUESTITEM_CFG_CHK_SHIFTOPN, 	tooltipText = QUESTITEM_CFG_CHK_SHIFTOPN_TT, setting="ShiftOpen" },
+	{ frame = "QuestItem_Config_Checkbox6", text = QUESTITEM_CFG_CHK_DISREQU,  	tooltipText = QUESTITEM_CFG_CHK_DISREQU_TT, setting="DisplayRequest", tooltipRequirement="Requires: AxuMenuItem"},
 	{ frame = "ItemFrameButton15", 			text = QUESTITEM_ITM_SHOWALL, 		tooltipText = QUESTITEM_ITM_SHOWALL, setting=nil },
 };
 
@@ -168,8 +169,14 @@ function QuestItem_Config_Items_Update()
 			itemName:SetText(QuestItemsIdx[offset].Item);
 			if(QuestItems[QuestItemsIdx[offset].Item].QuestName == QUESTITEM_UNIDENTIFIED) then
 				itemQuest:SetTextColor(1, 0, 0);
+				if(QuestItem_Settings["Display tooltip"] == true) then
+					itemButton.tooltipText = QUESTITEM_ITEMS_EDIT_M_TT;
+				end
 			else
 				itemQuest:SetTextColor(0.4, 0.5, 0.8);
+				if(QuestItem_Settings["Display tooltip"] == true) then
+					itemButton.tooltipText = QUESTITEM_ITEMS_EDIT_SHIFT_M_TT;
+				end
 			end
 			itemQuest:SetText(QuestItems[QuestItemsIdx[offset].Item].QuestName);
 			itemButton:Show();

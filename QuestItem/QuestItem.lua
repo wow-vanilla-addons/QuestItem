@@ -26,6 +26,13 @@ Feature summary:
 
 	
 History:
+	New in version 1.6.0:
+	- Added configurable tooltip for item list.
+	- Added Alt + right click to open QuestLog for an item.
+	
+	New in version 1.5.3:
+	- Updated french language
+	
 	New in version 1.5.2:
 	- Fixed RegisterForSave in 1.10
 
@@ -261,7 +268,7 @@ function QuestItem_VariablesLoaded()
 		QuestItem_Settings["DisplayRequest"] = false;
 	end
 	QuestItem_Settings["ShiftOpen"] = false;
-	QuestItem_Settings["AltOpen"] = false;
+	QuestItem_Settings["AltOpen"] = true;
 end
 
 
@@ -308,6 +315,32 @@ function QuestItem_IsQuestItem(tooltip)
 		end
 	end
 	return false;
+end
+
+--------------------------------------------
+-- Open the specified quest in the quest log 
+--------------------------------------------
+--------------------------------------------
+function QuestItem_OpenQuestLog(questName)
+	for y=1, GetNumQuestLogEntries(), 1 do
+		local QuestName, level, questTag, isHeader, isCollapsed, complete = GetQuestLogTitle(y);
+		if(questName == QuestName) then
+			SelectQuestLogEntry(y);
+			local logFrame = getglobal("QuestLogFrame");
+
+			if(logFrame ~= nil) then
+				if(logFrame:IsVisible()) then
+					ToggleQuestLog();
+				end
+				if(QuestLog_SetSelection == nil) then
+					QuestLog_SetSelection(y);
+				end
+				ToggleQuestLog();
+			end
+			return;
+		end
+	end
+	QuestItem_PrintToScreen(QUESTITEM_NO_QUEST);
 end
 
 ---------------------------------------

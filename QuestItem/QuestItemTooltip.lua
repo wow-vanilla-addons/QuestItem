@@ -73,13 +73,16 @@ local base_AIOI_ModifyItemTooltip;
 local base_LootLinkItemButton_OnEnter;
 local base_IMInv_ItemButton_OnEnter
 local base_ItemsMatrixItemButton_OnEnter;
+local base_ContainerFrameItemButton_OnClick;
+local base_QuestItem_AIOI_ContainerFrameItemButton_OnClick;
+local base_BankFrameItemButtonGeneric_OnClick;
+local base_BankFrameItemButtonBag_OnClick;
 --local base_EngInventory_ModifyItemTooltip;
 
 ----------------------------------
 -- [[ Hook tooltip functions ]] --
 ----------------------------------
 function QuestItem_HookTooltip()
-
 	-- Hook in alternative Chat/Hyperlinking code
 	base_Chat_OnHyperlinkShow = ChatFrame_OnHyperlinkShow;
 	ChatFrame_OnHyperlinkShow = QuestItem_Chat_OnHyperlinkShow;
@@ -111,13 +114,28 @@ function QuestItem_HookTooltip()
 		QuestItem_Debug("Hooking to AIOI");
 	end
 	
+	-- Hook click on inventory item
+	if(AllInOneInventoryFrameItemButton_OnClick ~= nil) then
+		base_ContainerFrameItemButton_OnClick = AllInOneInventoryFrameItemButton_OnClick;
+		AllInOneInventoryFrameItemButton_OnClick = QuestItem_ContainerFrameItemButton_OnClick;
+	else
+		base_ContainerFrameItemButton_OnClick = ContainerFrameItemButton_OnClick;
+		ContainerFrameItemButton_OnClick = QuestItem_ContainerFrameItemButton_OnClick;
+	end
+	
+	-- Hook bank item 
+	base_BankFrameItemButtonGeneric_OnClick = BankFrameItemButtonGeneric_OnClick;
+	BankFrameItemButtonGeneric_OnClick = QuestItem_BankFrameItemButtonGeneric_OnClick;
+	
+	--base_BankFrameItemButtonBag_OnClick = BankFrameItemButtonBag_OnClick;
+	--BankFrameItemButtonBag_OnClick = QuestItem_BankFrameItemButtonBag_OnClick;
+	
+	
 	-- [[
 	if(EngInventory_ModifyItemTooltip ~= nil) then
 		base_EngInventory_ModifyItemTooltip = EngInventory_ModifyItemTooltip;
 		EngInventory_ModifyItemTooltip = QuestItem_AIOI_ModifyItemTooltip;
 		QuestItem_Debug("Hooking to EngInventory");
-	else
-		QuestItem_Debug("No inventory stuff to hook");
 	end
 	-- ]] --
 end
@@ -158,7 +176,6 @@ function QuestItem_AIOI_ModifyItemTooltip(bag, slot, tooltipName, empty)
 	elseif(base_EngInventory_ModifyItemTooltip ~= nil) then
 		base_EngInventory_ModifyItemTooltip(bag, slot, tooltipName, nil);
 	end
-
 	local tooltip = getglobal(tooltipName);
 	if (not tooltip) then
 		tooltip = getglobal("GameTooltip");
@@ -219,7 +236,6 @@ end
 ------------------------------------------------------
 function QuestItem_ContainerFrameItemButton_OnEnter()
 	base_ContainerFrameItemButton_OnEnter();
-	
 	local frameID = this:GetParent():GetID();
 	local buttonID = this:GetID();
 	local link = GetContainerItemLink(frameID, buttonID);
@@ -234,6 +250,64 @@ function QuestItem_ContainerFrameItemButton_OnEnter()
 		QuestItem_AddTooltip(GameTooltip, name, link, quantity, itemCount)
 	end
 end
+
+------------------------------------
+-- Hook for click on container items
+------------------------------------
+------------------------------------
+function QuestItem_ContainerFrameItemButton_OnClick(button, ignoreModifiers)
+	local executeBase = true;
+	if(QuestItem_Settings["AltOpen"] == true) then
+		if(button == "RightButton" and not ignoreModifiers and IsAltKeyDown()) then
+			local bag, slot;
+			-- Look for bag and slot id
+			if(AllInOneInventoryFrameItemButton_OnClick ~= nil) then
+				bag, slot = AllInOneInventory_GetIdAsBagSlot(this:GetID());
+			else
+				bag = this:GetParent():GetID();		
+				slot = this:GetID();
+			end
+			
+			local link = GetContainerItemLink(bag, slot);
+			QuestItem_OpenLink(link);
+		end
+	end
+	-- Execute base method
+	if(executeBase) then
+		base_ContainerFrameItemButton_OnClick(button, ignoreModifiers);
+	end
+end
+
+function QuestItem_OpenLink(link)
+	local name = QuestItem_nameFromLink(link);
+	-- Open questlog for quest
+	if(name) then
+		if(QuestItems[name] and QuestItems[name].QuestName) then
+			QuestItem_OpenQuestLog(QuestItems[name].QuestName);
+			executeBase = false;
+		end
+	end
+end
+
+function QuestItem_BankFrameItemButtonGeneric_OnClick(button)
+	local executeBase = true;
+	if(QuestItem_Settings["AltOpen"] == true) then
+		if(button == "RightButton" and not ignoreModifiers and IsAltKeyDown()) then
+			local link = GetContainerItemLink(BANK_CONTAINER, this:GetID());
+			QuestItem_OpenLink(link);
+			executeBase = false;
+		end
+	end
+	if(executeBase) then
+		base_BankFrameItemButtonGeneric_OnClick(button, ignoreModifiers);
+	end
+end
+
+function QuestItem_BankFrameItemButtonBag_OnClick(button)
+	--QuestItem_Debug(this:GetID());
+end
+
+
 
 ----------------------------------------
 -- [[ Set tooltip for linked items ]] --
@@ -254,7 +328,6 @@ end
 
 function QuestItem_ContainerFrameItemButton_Update(frame)
 	base_ContainerFrame_Update(frame);
-	--QuestItem_Debug("QuestItem_ContainerFrameItemButton_OnUpdate");
 end
 
 ----------------------------------
@@ -286,70 +359,3 @@ function QuestItem_qualityFromLink(link)
 	end
 	return -1;
 end
-
--- The code below is not in use. It is a backup in case ItemsMatrix breaks something
---[[
-
-	--[[ ItemsMatrix support - grabbed from Norganna's EnhTooltip ]]--
-	if(IMInv_ItemButton_OnEnter ~= nil) then
-		base_IMInv_ItemButton_OnEnter = IMInv_ItemButton_OnEnter;
-		IMInv_ItemButton_OnEnter = QuestItem_IMInv_ItemButton_OnEnter;
-		
-		base_ItemsMatrixItemButton_OnEnter = ItemsMatrixItemButton_OnEnter;
-		ItemsMatrixItemButton_OnEnter = QuestItem_ItemsMatrixItemButton_OnEnter;
-		QuestItem_Debug("Hooking to ItemsMatrix");
-	end
-local function QuestItem_fakeLink(item, quality, name)
-	if (quality == nil) then 
-		quality = -1; 
-	end
-	if (name == nil) then 
-		name = "unknown"; 
-	end
-	local color = "ffffff";
-	if (quality == 4) then color = "a335ee";
-	elseif (quality == 3) then color = "0070dd";
-	elseif (quality == 2) then color = "1eff00";
-	elseif (quality == 0) then color = "9d9d9d";
-	end
-	return "|cff"..color.. "|H"..item.."|h["..name.."]|h|r";
-end
-
---[[ ItemsMatrix support - grabbed from Norganna's EnhTooltip ]]--
-function QuestItem_IMInv_ItemButton_OnEnter()
-	base_IMInv_ItemButton_OnEnter();
-	if(not IM_InvList) then 
-		return; 
-	end
-	local id = this:GetID();
-
-	if(id == 0) then
-		id = this:GetParent():GetID();
-	end
-	
-	local offset = FauxScrollFrame_GetOffset(ItemsMatrix_IC_ScrollFrame);
-	local item = IM_InvList[id + offset];
-
-	if (not item) then 
-		return; 
-	end
-	local imlink = ItemsMatrix_GetHyperlink(item.name);
-	local link = QuestItem_fakeLink(imlink, item.quality, item.name);
-	if (link) then
-		QuestItem_AddTooltip(GameTooltip, item.name, link, item.quality, item.count, 0)
-	end
-end
-
---[[ ItemsMatrix support - grabbed from Norganna's EnhTooltip ]]--
-function QuestItem_ItemsMatrixItemButton_OnEnter()
-	base_ItemsMatrixItemButton_OnEnter();
-	local imlink = ItemsMatrix_GetHyperlink(this:GetText());
-	if (imlink) then
-		local name = this:GetText();
-		local link = fakeLink(imlink, -1, name);
-		
-		QuestItem_AddTooltip(GameTooltip, name, link, -1, 1);
-	end
-end
-
-]]--

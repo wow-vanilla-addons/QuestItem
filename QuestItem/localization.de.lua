@@ -22,8 +22,10 @@ if (GetLocale()=="deDE") then
 	QUESTITEM_CFG_CHK_DISREQU_TT	= "Zeige einen 'Versuche Zuordnung' Menueintrag im Tooltip f\195\188r nichtindentifizierte Gegenst\195\164nde.";
 	QUESTITEM_CFG_CHK_SHIFTOPN 		= "'Shift + Klick' um QuestLog f\195\188r einen Gegenstand zu \195\182ffnen";
 	QUESTITEM_CFG_CHK_SHIFTOPN_TT	= "Aktiviere 'Shift + Linksklick' um das Questlog f\195\188r die Quest zu \195\182ffnen zu der dieser Gegenstand geh\195\182rt.";
-	QUESTITEM_CFG_CHK_ALTOPN 		= "Alt + Linksklick f\195\188r das QuestLog eines Gegenstandes";
-	QUESTITEM_CFG_CHK_ALTOPN_TT		= "Aktiviere 'Alt + Linksklick' um das Questlog f\195\188r die Quest zu \195\182ffnen zu der dieser Gegenstand geh\195\182rt.";
+	QUESTITEM_CFG_CHK_ALTOPN 		= "Alt + Rechtsklick f\195\188r das QuestLog eines Gegenstandes";
+	QUESTITEM_CFG_CHK_ALTOPN_TT		= "Aktiviere 'Alt + Rechtsklick' um das Questlog f\195\188r die Quest zu \195\182ffnen zu der dieser Gegenstand geh\195\182rt.";
+	QUESTITEM_CFG_CHK_DISPLAYTT		= "Display tooltip in item list";
+	QUESTITEM_CFG_CHK_DISPLAYTT_TT	= "Display tooltip telling you how to edit items in the item list - need translation";
 	
 	QUESTITEM_INP_TITLE				= "QuestItem Zuordnung";
 	QUESTITEM_ITM_SHOWALL			= "Zeige nur nicht zugeordnete";

@@ -1,5 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<Script file="QuestItemConfig.lua" />
+
 	<!-- QUESTNAME INPUT FRAME -->
 	<Frame name="QuestItemInputFrame" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="QuestItemConfigFrame" enableKeyboard="true">
 		<Size>
@@ -283,6 +284,19 @@
 				PlaySound("igMainMenuOptionCheckBoxOn");
 				QuestItem_InputFrame_Open(this:GetName() .. "ButtonTextName");
 			</OnClick>
+			<OnEnter>
+				if ( this.tooltipText ) then
+					GameTooltip:SetOwner(this, "ANCHOR_TOPLEFT");
+					GameTooltip:SetText(this.tooltipText, nil, nil, nil, nil, 1);
+				end
+				if ( this.tooltipRequirement ) then
+					GameTooltip:AddLine(this.tooltipRequirement, "", 1.0, 1.0, 1.0);
+					GameTooltip:Show();
+				end
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
 		</Scripts>
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
 	</Button>
@@ -441,8 +455,8 @@
 							</Anchor>
 						</Anchors>
 					</CheckButton>
-					<!-- Display request menu -->
-					<CheckButton name="QuestItem_Config_Checkbox3" inherits="QuestItemCheckboxTemplate" id="3" hidden="true">
+					<!-- Display tooltip for item list -->
+					<CheckButton name="QuestItem_Config_Checkbox3" inherits="QuestItemCheckboxTemplate" id="3">
 						<Anchors>
 							<Anchor point="LEFT" relativePoint="BOTTOMLEFT" relativeTo="QuestItem_Config_Checkbox2">
 								<Offset>
@@ -451,9 +465,8 @@
 							</Anchor>
 						</Anchors>
 					</CheckButton>
-					
-					<!-- Shift click to open questlog -->
-					<CheckButton name="QuestItem_Config_Checkbox4" inherits="QuestItemCheckboxTemplate" id="4" hidden="true">
+					<!-- Alt click to open questlog -->
+					<CheckButton name="QuestItem_Config_Checkbox4" inherits="QuestItemCheckboxTemplate" id="4">
 						<Anchors>
 							<Anchor point="LEFT" relativePoint="BOTTOMLEFT" relativeTo="QuestItem_Config_Checkbox3">
 								<Offset>
@@ -463,10 +476,21 @@
 						</Anchors>
 					</CheckButton>
 					
-					<!-- Alt click to open questlog -->
+					<!-- Shift click to open questlog -->
 					<CheckButton name="QuestItem_Config_Checkbox5" inherits="QuestItemCheckboxTemplate" id="5" hidden="true">
 						<Anchors>
 							<Anchor point="LEFT" relativePoint="BOTTOMLEFT" relativeTo="QuestItem_Config_Checkbox4">
+								<Offset>
+									<AbsDimension x="0" y="-20" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					
+					<!-- Display request menu -->
+					<CheckButton name="QuestItem_Config_Checkbox6" inherits="QuestItemCheckboxTemplate" id="6" hidden="true">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="BOTTOMLEFT" relativeTo="QuestItem_Config_Checkbox5">
 								<Offset>
 									<AbsDimension x="0" y="-20" />
 								</Offset>
