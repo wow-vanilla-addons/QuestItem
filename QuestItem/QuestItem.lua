@@ -1,44 +1,21 @@
 --[[ 
 Description
-	If you have ever had a quest item you have no idea which quest it belongs to, and if it safe to destroy, this AddOn is for you.	
+If you have ever had a quest item you have no idea which quest it belongs to, and if it safe to destroy, this AddOn is for you.	
 
-	QuestItem stores an in-game database over quest items and tell you which quest they belong to. Useful to find out if you 
-	are still o	n the quest, and if it safe to destroy it. The AddOn will map items to quests when you pick them up, but also 
-	has a limited backward compatability. If you see tooltip for a questitem you have picked up before installing the addon, 
-	QuestItem will try to find the item in your questlog, and map it to a quest. In case unsuccessful, the item will be marked 
-	as unidentified.
-
-	Currently, there are some quest items QuestItem will not be able to identify as the name of the item is not found in 
-	the questlog. These items are usually pre-requisites for some quest, and will be identified as soon as you complete the first 
-	step. For example: Take a sample of the water in some river. The item will be "Empty sampeling tube", and will not be 
-	mapped to a quest as it is not mentioned in the questlog. When filling the tube, it will have a new name which will be identified,
-	however, the "Empty sampeling tube" will still be unidentified.
-
-This is my first AddOn, so I hope you'll be gentle with me ;o)
-I will try to get rid of dependencies to LootLink in the near future.
-
-Feature summary:
-- Identify quest items when picked up.
-- Show quest name and status in tooltip for quest items.
-- Will try to identify items picked up before the AddOn was installed.
-- Identified items are available for all your characters, and status is unique for your character.
-- Displays how many items are needed to complete quest, and how many you currently have.
-
-If you like this addon (or even if you don't), donations are always welcome to my character Shagoth on the Stormreaver server ;D
-	
-History:
-	New in version 0.3:
-	- Using Enchanted Tooltip instead of LootLink to display item tooltip.
-	New in version 0.2:
-	- Quest items that are not labeled "Quest Item" are now displayed with status in the tooltip.
-	- Item count is now displayed next to the quest name in tooltip.
+QuestItem stores an in-game database over quest items and tell you which quest they belong to. Useful to find out if you 
+are still o	n the quest, and if it safe to destroy it. The AddOn will map items to quests when you pick them up, but also 
+has a limited backward compatability. If you see tooltip for a questitem you have picked up before installing the addon, 
+QuestItem will try to find the item in your questlog, and map it to a quest. In case unsuccessful, the item will be marked 
+as unidentified.
 ]]--
-QUESTITEM_VERSION = "0.3";
+
+
 DEBUG = false;
-str_unidentified = "Unidentified quest";
 
 -- QuestItem array
 QuestItems = {};
+-- Settings
+QuestItem_Settings = {};
 
 ----------------------------------------------------
 -- Updates the database with item and quest mappings
@@ -52,7 +29,7 @@ function QuestItem_UpdateItem(item, quest, count, total, status)
 	end
 	
 	-- If old quest name was unidentified, save new name
-	if(QuestItem_SearchString(QuestItems[item].QuestName, str_unidentified) and not QuestItem_SearchString(quest, QuestItems[item].QuestName) ) then
+	if(QuestItem_SearchString(QuestItems[item].QuestName, QUESTITEM_UNIDENTIFIED) and not QuestItem_SearchString(quest, QuestItems[item].QuestName) ) then
 		QuestItems[item].QuestName = quest;
 	end
 
@@ -128,7 +105,7 @@ end
 function QuestItem_LocateQuest(itemText, itemCount, itemTotal)
 	local QuestName;
 	-- Only look through the questlog if the item has not already been mapped to a quest
-	if(not QuestItems[itemText] or QuestItems[itemText].QuestName == str_unidentified) then
+	if(not QuestItems[itemText] or QuestItems[itemText].QuestName == QUESTITEM_UNIDENTIFIED) then
 		QuestName = QuestItem_FindQuest(itemText);
 	else
 		QuestName = QuestItems[itemText].QuestName;
@@ -138,8 +115,8 @@ function QuestItem_LocateQuest(itemText, itemCount, itemTotal)
 	if(QuestName ~= nil) then
 		QuestItem_Debug("Found quest for " .. itemText .. ": " .. QuestName);
 		QuestItem_UpdateItem(itemText, QuestName, itemCount, itemTotal, 0);
-	else
-		QuestItem_Debug("No quest found for " .. itemText);
+	elseif(QuestItem_Settings["Alert"]) then
+		QuestItem_PrintToScreen(QUESTITEM_CANTIDENTIFY .. itemText);
 	end
 end
 
@@ -152,11 +129,23 @@ function QuestItem_OnLoad()
 	TT_AddTooltip = QuestItem_AddTooltip;
 	
 	RegisterForSave("QuestItems");
-	this:RegisterEvent("UI_INFO_MESSAGE");
+	RegisterForSave("QuestItem_Settings");
+	this:RegisterEvent("VARIABLES_LOADED");
+	this:RegisterEvent("ITEM_PUSH");
+	
+	if(QuestItem_Settings["version"] and QuestItem_Settings["Enabled"] == true) then
+		this:RegisterEvent("UI_INFO_MESSAGE");
+	end
+	
+	
+	-- Register slash commands
+	SLASH_QUESTITEM1 = "/questitem";
+	SLASH_QUESTITEM2 = "/qi";
+	SlashCmdList["QUESTITEM"] = QuestItem_Config_OnCommand;
 	
 	if ( DEFAULT_CHAT_FRAME ) then 
-		DEFAULT_CHAT_FRAME:AddMessage("Shagot's QuestItem v" ..QUESTITEM_VERSION.. " loaded", 0.4, 0.5, 0.8);
-		UIErrorsFrame:AddMessage("Loaded Shagoth's QuestItem", 0.4, 0.5, 0.8, 1.0, 8);
+		--DEFAULT_CHAT_FRAME:AddMessage(QUESTITEM_LOADED, 0.4, 0.5, 0.8);
+		QuestItem_PrintToScreen(QUESTITEM_LOADED);
 	end
 end
 
@@ -165,6 +154,22 @@ end
 -----------------
 -----------------
 function QuestItem_OnEvent(event)
+	if(event == "VARIABLES_LOADED") then
+		QuestItem_VariablesLoaded();
+		this:UnregisterEvent("VARIABLES_LOADED");
+		return;
+	elseif(event == "ITEM_PUSH") then
+		if(arg1) then
+			QuestItem_Debug(arg1);
+		end
+		if(arg2) then
+			QuestItem_Debug(arg2);
+		end
+		if(arg3) then
+			QuestItem_Debug(arg3);
+		end
+	end
+	
 	if(not arg1) then
 		return;
 	end
@@ -174,11 +179,42 @@ function QuestItem_OnEvent(event)
 		local itemCount = gsub(arg1,"(.*): (%d+)/(%d+)","%2");
 		local itemTotal = gsub(arg1,"(.*): (%d+)/(%d+)","%3");
 		
-		QuestItem_LocateQuest(itemText, itemCount, itemTotal);
+		-- Ignore trade and duel events
+		if(not strfind(itemText, QUESTITEM_TRADE) and not strfind(itemText, QUESTITEM_DUEL) and not strfind(itemText, QUESTITEM_DISCOVERED)) then
+			QuestItem_LocateQuest(itemText, itemCount, itemTotal);
+		end
 	elseif(event == "DELETE") then
 		if(QuestItems[itemText]) then
 			QuestItems[itemText] = nil;
 			QuestItem_Debug("Deleted");
 		end
 	end
+end
+
+------------------------------------
+-- Initialize settings if not found. 
+------------------------------------
+------------------------------------
+function QuestItem_VariablesLoaded()
+	if ( QuestItem_Settings and QuestItem_Settings["version"] == QUESTITEM_VERSION ) then
+		return;
+	end
+	
+	if (not QuestItem_Settings) then
+		QuestItem_Settings = { };	
+	end
+	
+	-- No settings exist
+	QuestItem_Settings["version"] = QUESTITEM_VERSION;
+	
+	QuestItem_Settings["Enabled"] = true;
+	QuestItem_Settings["Alert"] = true;
+	-- Check if AxuItemMenus is installed
+	if(AxuItemMenus_AddTestHook) then
+		QuestItem_Settings["DisplayRequest"] = false;
+	else
+		QuestItem_Settings["DisplayRequest"] = false;
+	end
+	QuestItem_Settings["ShiftOpen"] = false;
+	QuestItem_Settings["AltOpen"] = false;
 end

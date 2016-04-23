@@ -1,18 +1,19 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+	<Script file="localization.lua"/>
 	<Script file="QuestItem.lua"/>
 	<Script file="QuestItemFunctions.lua" />
 	<Script file="QuestItemTooltip.lua" />
+	<Script file="QuestItemMenu.lua" />
+	<Include file="QuestItemConfig.xml" />
 	<Frame name="QuestItem" parent="UIParent" hidden="true">
 		<Scripts>
 			<OnLoad>
 				QuestItem_OnLoad();
+				QuestItem_Menu_OnLoad();
 			</OnLoad>
 			<OnEvent>
 				QuestItem_OnEvent(event);
 			</OnEvent>
 		</Scripts>
 	</Frame>
-	
-	<!-- GameTooltip name="QuestItemTooltip" inherits="GameTooltipTemplate" parent="UIParent" hidden="true"/>
-	<GameTooltip name="QIHiddenTooltip" inherits="GameTooltipTemplate" parent="UIParent" hidden="true"/ -->
 </Ui>

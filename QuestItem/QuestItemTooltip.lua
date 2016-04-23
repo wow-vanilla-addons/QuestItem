@@ -4,6 +4,10 @@
 ----------------------------------------------------------
 function QuestItem_AddTooltip(frame, name, link, quantity, count)
 	QuestItem_OldTooltip(frame, name, link, quality, count);
+	if(QuestItem_Settings["Enabled"] == nil or QuestItem_Settings["Enabled"] == false) then
+		return;
+	end
+	
 	local tooltip = getglobal("GameTooltip");
 	local embed = true;
     if ( not tooltip ) then
@@ -14,14 +18,14 @@ function QuestItem_AddTooltip(frame, name, link, quantity, count)
     if ( tooltipInfo[1] ) then
 		
 		-- Item not found in the database - look for it of it is a quest item
-		if(not QuestItems[name] or QuestItem_SearchString(QuestItems[name].QuestName, str_unidentified) ) then
+		if(not QuestItems[name] or QuestItem_SearchString(QuestItems[name].QuestName, QUESTITEM_UNIDENTIFIED) ) then
 			-- Check if the item is a Quest Item
 			if(QuestItem_IsQuestItem(tooltip) ) then
 				local name = tooltipInfo[1].left;
 
 				local QuestName = QuestItem_FindQuest(name);
 				if(not QuestName) then
-					QuestItem_UpdateItem(name, str_unidentified, quantity, 0, 3)
+					QuestItem_UpdateItem(name, QUESTITEM_UNIDENTIFIED, quantity, 0, 3)
 				else
 					QuestItem_UpdateItem(name, QuestName, quantity, 0, 0)
 				end
@@ -46,7 +50,7 @@ function QuestItem_AddTooltip(frame, name, link, quantity, count)
 					end
 				end
 				-- Do not display status on the quest if it is unidentified
-				if(not QuestItem_SearchString(QuestItems[name].QuestName, str_unidentified) ) then
+				if(not QuestItem_SearchString(QuestItems[name].QuestName, QUESTITEM_UNIDENTIFIED) ) then
 					-- Display quest status
 					if(QuestItems[name][UnitName("player")].QuestStatus == 0) then
 						TT_AddLine("Quest is active", nil, embed);

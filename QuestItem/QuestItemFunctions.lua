@@ -14,6 +14,10 @@ function QuestItem_Debug(message)
 	end
 end
 
+function QuestItem_PrintToScreen(message)
+	UIErrorsFrame:AddMessage(message, 0.4, 0.5, 0.8, 1.0, 8);
+end
+
 ---------------------------------------------------
 -- Find out if an item is a quest item by searching 
 -- the text in the tooltip.
