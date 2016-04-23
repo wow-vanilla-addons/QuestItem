@@ -30,6 +30,13 @@ History:
 	- Added support for Menus on quest items using AxuMenuItems mod.
 	- Request to sky channel for identification of items if not found in the questlog.
 	
+	New in version 1.3.3:
+	- Alert on unidentified items is now working
+	
+	New in version 1.3.2:
+	- Removed an annoying bug with messages saying QuestItem was unable to identify quest for fishing, flight path, trade skills, sending mail, etc
+	- Fixed a bug in a function for converting values to int (thanks to piderman)
+	
 	New in version 1.3.1:
 	- Bugfix for the error 'Interface\AddOns\QuestItem\QuestItemFunctions.lua:78 :bad argument #1 to 'strsub' (string expected, got nil)'
 	
@@ -71,8 +78,8 @@ History:
 ]]--
 
 -- /script arg1="Dentrium-Kraftstein: 1/1"; QuestItem_OnEvent("DELETE"); arg1="Roon's Kodo Horn: 1/1"; QuestItem_OnEvent("UI_INFO_MESSAGE");
--- /script arg1="Dentrium Power Stone: 5/8"; QuestItem_OnEvent("UI_INFO_MESSAGE"); QuestItem_OnEvent("DELETE");
--- /script arg1="An' Alleum-Kraftstein"; QuestItem_OnEvent("DELETE"); QuestItem_OnEvent("DELETE");
+-- /script arg1="Ragefire Shaman slain: 5/8"; QuestItem_OnEvent("UI_INFO_MESSAGE"); QuestItem_OnEvent("DELETE");
+-- /script arg1="Sent mail"; QuestItem_OnEvent("DELETE"); QuestItem_OnEvent("DELETE");
 
 DEBUG = false;
 QI_CHANNEL_NAME = "QuestItem";
@@ -194,8 +201,8 @@ function QuestItem_LocateQuest(itemText, itemCount, itemTotal)
 	if(QuestName ~= nil) then
 		QuestItem_Debug("Found quest for " .. itemText .. ": " .. QuestName);
 		QuestItem_UpdateItem(itemText, QuestName, itemCount, itemTotal, 0);
-	--elseif(QuestItem_Settings["Alert"]) then
---		QuestItem_PrintToScreen(QUESTITEM_CANTIDENTIFY .. itemText);
+	elseif(QuestItem_Settings["Alert"]) then
+		QuestItem_PrintToScreen(QUESTITEM_CANTIDENTIFY .. itemText);
 	end
 end
 
@@ -244,11 +251,8 @@ function QuestItem_OnEvent(event)
 	if(event == "UI_INFO_MESSAGE") then
 		local itemCount = gsub(arg1,"(.*): (%d+)/(%d+)","%2");
 		local itemTotal = gsub(arg1,"(.*): (%d+)/(%d+)","%3");
-		if(arg2 ~= nil) then
-			QuestItem_Debug("arg2: " .. arg2);
-		end
 		-- Ignore trade and duel events
-		if(not strfind(itemText, QUESTITEM_TRADE) and not strfind(itemText, QUESTITEM_DUEL) and not strfind(itemText, QUESTITEM_DISCOVERED)) then
+		if(itemText ~= arg1 and not strfind(itemText, QUESTITEM_SLAIN)) then
 			QuestItem_Debug("Looking for quest item "..itemText);
 			QuestItem_LocateQuest(itemText, itemCount, itemTotal);
 		end

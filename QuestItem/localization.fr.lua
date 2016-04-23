@@ -2,9 +2,7 @@ if (GetLocale()=="frFR") then
 	-- Translate below here
 	QUESTITEM_UNIDENTIFIED 			= "Non identifié qu\195\170te";
 	QUESTITEM_LOADED 				= QUESTITEM_TITLE .. " " .. QUESTITEM_VERSION .. " Chargé";
-	QUESTITEM_TRADE 				= "Transaction";
-	QUESTITEM_DUEL 					= "Duel";
-	QUESTITEM_DISCOVERED			= "DÃ©couverte";
+	QUESTITEM_SLAIN					= "tu\195\169";
 	QUESTITEM_QUESTITEM				= "Objet de qu\195\170te";
 	
 	QUESTITEM_CANTIDENTIFY			= "ProblÃ©me d’identification de qu\195\170te ";
@@ -23,9 +21,7 @@ if (GetLocale()=="frFR") then
 	QUESTITEM_CFG_CHK_DISREQU_TT	= "Aficher 'Requ\195\170te d'attribution' menuitem dans le tooltip pour les objets non -identifiÃ©s.";
 	QUESTITEM_CFG_CHK_SHIFTOPN 		= "Majuscule + clique pour ouvrir QuestLog pour objet";
 	QUESTITEM_CFG_CHK_SHIFTOPN_TT	= "Permettre Majuscule + clique-Ã´-gauche pour ovrir le questlog pour la qu\195\170te Ã´ laquelle un objet appartient.";
---	QUESTITEM_CFG_CHK_SHIFTOPN_TT	= "Permettre Majuscule + clique-à-gauche pour ovrir le questlog pour la quête à laquelle un objet appartient.";
 	QUESTITEM_CFG_CHK_ALTOPN 		= "Alternative + clique pourouvir QuestLog pour objet.";
---	QUESTITEM_CFG_CHK_ALTOPN_TT		= "Permettre Alternative + clique-à-gauche pour ouvrir le questlog pour la quête à laquelle un objet appartient.";
 	
 	QUESTITEM_INP_TITLE				= "QuestItem Attribution";
 	QUESTITEM_ITM_SHOWALL			= "Afficher les non-attibutions seulement";
@@ -38,3 +34,5 @@ end
 -- ê = \195\170
 -- à = Ã´
 -- é = Ã©
+-- ö = \195\182
+-- é = \195\169

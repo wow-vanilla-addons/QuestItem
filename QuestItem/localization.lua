@@ -2,7 +2,7 @@
 Default localization for QuestItem
 ]]--
 
-QUESTITEM_VERSION 				= "1.3.2";
+QUESTITEM_VERSION 				= "1.3.3";
 QUESTITEM_NAME 					= "QuestItem";
 QUESTITEM_TITLE 				= "Shagoth's " .. QUESTITEM_NAME;
 
@@ -10,9 +10,7 @@ QUESTITEM_TITLE 				= "Shagoth's " .. QUESTITEM_NAME;
 -- Translate below here
 QUESTITEM_UNIDENTIFIED 			= "Unidentified quest";
 QUESTITEM_LOADED 				= QUESTITEM_TITLE .. " " .. QUESTITEM_VERSION .. " Loaded";
-QUESTITEM_TRADE 				= "Trade";
-QUESTITEM_DUEL 					= "Duel";
-QUESTITEM_DISCOVERED			= "Discovered";
+QUESTITEM_SLAIN					= "slain";
 QUESTITEM_QUESTITEM				= "Quest Item";
 
 QUESTITEM_CANTIDENTIFY			= "Unable to identify quest for ";
