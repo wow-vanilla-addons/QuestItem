@@ -2,8 +2,10 @@
 -- Add tooltip information to the existing GameTooltip
 ----------------------------------------------------------
 ----------------------------------------------------------
-function QuestItem_AddTooltip(frame, name, quantity, item)
+function QuestItem_AddTooltip(frame, name, link, quantity, count)
+	QuestItem_OldTooltip(frame, name, link, quality, count);
 	local tooltip = getglobal("GameTooltip");
+	local embed = true;
     if ( not tooltip ) then
 		return;
     end
@@ -31,10 +33,11 @@ function QuestItem_AddTooltip(frame, name, quantity, item)
 			if(QuestItems[name][UnitName("player")]) then
 				-- Total and Count is set, and is grater than 0 - don't want to display i.e 1/0
 				if( (QuestItems[name].Total and QuestItems[name].Total > 0) and (QuestItems[name][UnitName("player")].Count and QuestItems[name][UnitName("player")].Count > 0) ) then
-					tooltip:AddLine(QuestItems[name].QuestName .. " " .. QuestItems[name][UnitName("player")].Count .. "/" .. QuestItems[name].Total, 0.4, 0.5, 0.8);
+					TT_AddLine(QuestItems[name].QuestName .. " " .. QuestItems[name][UnitName("player")].Count .. "/" .. QuestItems[name].Total, nil, embed);
 				else
-					tooltip:AddLine(QuestItems[name].QuestName, 0.4, 0.5, 0.8);
+					TT_AddLine(QuestItems[name].QuestName, nil, embed);
 				end
+				TT_LineColor(0.4, 0.5, 0.8);
 				
 				-- Check status for quest - if it can't be found change status to abandoned/complete
 				if(QuestItems[name][UnitName("player")].QuestStatus ~= 0) then
@@ -46,15 +49,18 @@ function QuestItem_AddTooltip(frame, name, quantity, item)
 				if(not QuestItem_SearchString(QuestItems[name].QuestName, str_unidentified) ) then
 					-- Display quest status
 					if(QuestItems[name][UnitName("player")].QuestStatus == 0) then
-						tooltip:AddLine("Quest is active", 0, 1, 0);
+						TT_AddLine("Quest is active", nil, embed);
+						TT_LineColor(0, 1, 0);
 					elseif(QuestItems[name][UnitName("player")].QuestStatus == 1 or QuestItems[name][UnitName("player")].QuestStatus == 2) then
-						tooltip:AddLine("Quest is complete or abandoned", 0.7, 0.7, 0.7);
+						TT_AddLine("Quest is complete or abandoned", nil, embed);
+						TT_LineColor(0.7, 0.7, 07);
 					end
 				end
 			else
-				tooltip:AddLine(QuestItems[name].QuestName, 0.4, 0.5, 0.8);
+				TT_AddLine(QuestItems[name].QuestName, nil, embed);
+				TT_LineColor(0.4, 0.5, 0.8);
 			end
-			tooltip:Show();
+			TT_Show(frame);
 		end
 	end
 end

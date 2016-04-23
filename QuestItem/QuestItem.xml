@@ -12,32 +12,7 @@
 			</OnEvent>
 		</Scripts>
 	</Frame>
-		<Button name="QuestItemItemButtonTemplate" virtual="true">
-		<Size>
-			<AbsDimension x="300" y="16"/>
-		</Size>
-		<Scripts>
-			<OnLoad>
-				this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-			</OnLoad>
-			<OnEnter>
-				QuestItemItemButton_OnEnter();
-			</OnEnter>
-
-		</Scripts>
-		<NormalText name="$parentText" inherits="GameFontNormal" justifyH="LEFT">
-			<Size>
-				<AbsDimension x="275" y="12"/>
-			</Size>
-			<Anchors>
-				<Anchor point="LEFT">
-					<Offset>
-						<AbsDimension x="20" y="0"/>
-					</Offset>
-				</Anchor>
-			</Anchors> 
-		</NormalText>
-	</Button>
-	<GameTooltip name="QuestItemTooltip" inherits="GameTooltipTemplate" parent="UIParent" hidden="true"/>
-	<GameTooltip name="QIHiddenTooltip" inherits="GameTooltipTemplate" parent="UIParent" hidden="true"/>
+	
+	<!-- GameTooltip name="QuestItemTooltip" inherits="GameTooltipTemplate" parent="UIParent" hidden="true"/>
+	<GameTooltip name="QIHiddenTooltip" inherits="GameTooltipTemplate" parent="UIParent" hidden="true"/ -->
 </Ui>

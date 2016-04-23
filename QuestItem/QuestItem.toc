@@ -2,6 +2,6 @@
 ## Interface: 1600
 ## Version: 0.1
 ## Notes: QuestItem stores an in-game database over quest items and tell you which quest they belong to. Useful to find out if you are still on the quest, and if it safe to destroy it.
-## RequiredDeps: LootLink
+## RequiredDeps: EnhTooltip
 ## SavedVariables: QuestItems
 QuestItem.xml
