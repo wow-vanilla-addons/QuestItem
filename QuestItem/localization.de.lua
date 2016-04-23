@@ -1,5 +1,6 @@
 -- QuestItem DE localization
--- Translated by: Thernel
+-- Last Update : 04/27/2006 ( by Thernel )
+
 if (GetLocale()=="deDE") then
 	QUESTITEM_UNIDENTIFIED 			= "Unidentifizierte quest";
 	QUESTITEM_LOADED 				= QUESTITEM_TITLE .. " " .. QUESTITEM_VERSION .. " Geladen";
@@ -35,6 +36,11 @@ if (GetLocale()=="deDE") then
 	QUESTITEM_INP_TITLE					= "QuestItem Zuordnung";
 	QUESTITEM_ITM_SHOWALL				= "Zeige nur nicht zugeordnete";
 	QUESTITEM_ITM_SHOWALL_TT			= "Entfernen um nur nicht zugeordnete Gegenst\195\164nde anzuzeigen.";
+	
+	QUESTITEM_ITEMS_EDIT_M_TT 			= "Right click to edit";
+	QUESTITEM_ITEMS_EDIT_SHIFT_M_TT 	= "Shift + right click to edit";
+
+	QUESTITEM_NO_QUEST					= "The quest is not in your questlog";
 	
 	QUESTITEM_SAVE						= "Speichern";
 	QUESTITEM_CANCEL					= "Abbrechen";

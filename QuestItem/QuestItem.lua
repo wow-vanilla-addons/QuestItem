@@ -14,8 +14,9 @@ Feature summary:
 - Will try to identify items picked up before the AddOn was installed.
 - Identified items are available for all your characters, and status is unique for your character.
 - Displays how many items are needed to complete quest, and how many you currently have.
-- Manual mapping for unidentified items.
-- Change quest status for items in the item list.
+- Manual mapping for unidentified items (right click) in item list.
+- Edit of manual mapping for items (shift + right click).
+- Change quest status for items in the item list (alt + left click).
 - Configuration
 
 Known issues:
@@ -24,16 +25,20 @@ Known issues:
 
 	
 History:
-New in version 1.7.0:
-- Integration with QuestHistory
-- Improved quest status reporting (abandoned, complete)
-- Added icon for items in the list (Old items won't get an icon as I don't know how to find it).
-- Option to only display items for current character.
-- Option to show/hide count/totalcount for items in tooltip and in list.
-- Proper docking of main window so that you can open multiple windows.
-- Quest item information was not displayed for items opened from a link in chat. Fixed.
-- It is now possible to change the quest status for a quest item from the item list by left clicking the item while holding down the Alt key.
-- Fixed a nil-error introduced by GroupButtons when AllInOneInventory was not installed.
+	New in version 1.7.1:
+	- Minor changes in language files
+	- Fixed a spelling error that prevented the edit box for items to display.
+	
+	New in version 1.7.0:
+	- Integration with QuestHistory
+	- Improved quest status reporting (abandoned, complete)
+	- Added icon for items in the list (Old items won't get an icon as I don't know how to find it).
+	- Option to only display items for current character.
+	- Option to show/hide count/totalcount for items in tooltip and in list.
+	- Proper docking of main window so that you can open multiple windows.
+	- Quest item information was not displayed for items opened from a link in chat. Fixed.
+	- It is now possible to change the quest status for a quest item from the item list by left clicking the item while holding down the Alt key.
+	- Fixed a nil-error introduced by GroupButtons when AllInOneInventory was not installed.
 	
 	New in version 1.6.0:
 	- Added configurable tooltip for item list.

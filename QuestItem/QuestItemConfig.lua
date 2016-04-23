@@ -242,13 +242,14 @@ end
 function QuestItem_InputFrame_Open(button, itemName)
 	local itemLabel = getglobal(itemName):GetText();
 	-- Display input frame for unidentified items, and if the shift key is down	
-	if(button == "RigthButton" and not QuestItemInputFrame:IsVisible() and (QuestItems[itemLabel].QuestName == QUESTITEM_UNIDENTIFIED or IsShiftKeyDown())) then
+	if(button == "RightButton" and (QuestItems[itemLabel].QuestName == QUESTITEM_UNIDENTIFIED or IsShiftKeyDown())) then
+		if(not QuestItemInputFrame:IsVisible()) then
 			QuestItemInputEditBox:SetText(QuestItems[itemLabel].QuestName);
 			QuestItemInputEditBox:HighlightText();
-
 			QuestItemInputFrame:Show();
 			QuestItemInputFrameHeaderTitle:SetText(itemLabel);
-	elseif(IsAltKeyDown() and QuestItems[itemLabel][UnitName("player")]) then
+		end
+	elseif(button == "LeftButton" and IsAltKeyDown() and QuestItems[itemLabel][UnitName("player")]) then
 		-- Toggle quest status
 		if(QuestItems[itemLabel][UnitName("player")].QuestStatus < QUESTSTATUS_COMPLETE) then
 			QuestItems[itemLabel][UnitName("player")].QuestStatus = QuestItems[itemLabel][UnitName("player")].QuestStatus + 1;
