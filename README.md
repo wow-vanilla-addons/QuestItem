@@ -25,7 +25,7 @@ QuestHistory addon is recommended.
 * Change quest status for items in the item list (alt + left click).
 * Configuration
 
-# Known issues
+## Known issues
 * Haven't figured a way to open questlog for items in bank bags
 
 ## Authors
