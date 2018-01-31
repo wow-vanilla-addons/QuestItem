@@ -50,3 +50,5 @@ QUESTITEM_NO_QUEST					= "The quest is not in your questlog";
 
 QUESTITEM_SAVE						= "Save";
 QUESTITEM_CANCEL					= "Cancel";
+
+QUESTITEM_ENTER_QUEST_NAME 			= "Enter the name of the quest:"
