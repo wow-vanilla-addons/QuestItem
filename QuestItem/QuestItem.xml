@@ -2,6 +2,7 @@
 	<Script file="localization.lua"/>
 	<Script file="localization.de.lua"/>
 	<Script file="localization.fr.lua"/>
+	<Script file="localization.ru.lua"/>
 	<Script file="QuestItem.lua"/>
 	<Script file="QuestItemTooltip.lua" />
 	<Include file="QuestItemConfig.xml" />

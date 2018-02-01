@@ -48,7 +48,7 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentHeaderDescription" inherits="GameFontNormal" text="Enter the name of the quest:">
+				<FontString name="$parentHeaderDescription" inherits="GameFontNormal" text="QUESTITEM_ENTER_QUEST_NAME">
 					<Anchors>
 						<Anchor point="TOP">
 							<Offset>
